@@ -1,28 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Tomb_Raider_Resizer
+namespace TombRaiderResizer
 {
+    /// <summary>
+    /// Represents a game and its associated process names.
+    /// </summary>
     public class GameInfo
     {
         public string Title { get; set; }
         public List<string> ProcessNames { get; set; }
 
-        // Konstruktor mit variabler Anzahl von Prozessnamen
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GameInfo"/> class with the specified title and process names.
+        /// </summary>
+        /// <param name="title">The title of the game.</param>
+        /// <param name="processNames">One or more process names associated with the game.</param>
         public GameInfo(string title, params string[] processNames)
         {
             Title = title;
             ProcessNames = new List<string>(processNames);
         }
 
-        // Überschreiben von ToString, falls du die Objekte z.B. in einer ListBox anzeigen möchtest
-        public override string ToString()
-        {
-            return Title;
-        }
+        /// <summary>
+        /// Returns the title of the game.
+        /// </summary>
+        public override string ToString() => Title;
     }
-
 }

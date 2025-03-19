@@ -5,24 +5,23 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Tomb_Raider_Resizer
+namespace TombRaiderResizer
 {
-    class Resize
+    /// <summary>
+    /// Provides methods to resize, reposition, and modify window styles using Win32 API calls.
+    /// </summary>
+    public static class ResizeHelper
     {
-        // Für 64-Bit: SetWindowLongPtr; für 32-Bit: SetWindowLong
+        #region Win32 API Imports
+
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
         private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
         [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
         private static extern IntPtr SetWindowLong32(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
-        // Kompatible Methode, die je nach Plattform die richtige Funktion aufruft
-        private static IntPtr SetWindowLongPtrCompat(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
-        {
-            return IntPtr.Size == 8
-                ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong)
-                : SetWindowLong32(hWnd, nIndex, dwNewLong);
-        }
+        private static IntPtr SetWindowLongPtrCompat(IntPtr hWnd, int nIndex, IntPtr dwNewLong) =>
+            IntPtr.Size == 8 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong) : SetWindowLong32(hWnd, nIndex, dwNewLong);
 
         [DllImport("user32.dll", SetLastError = true)]
         static extern int GetWindowLong(IntPtr hWnd, int nIndex);
@@ -37,31 +36,56 @@ namespace Tomb_Raider_Resizer
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr hwnd, int nCmdShow);
 
-        // RedrawWindow für komplettes Neuzeichnen
         [DllImport("user32.dll")]
         static extern bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, uint flags);
 
-        // UpdateWindow, um sofort ein WM_PAINT zu erzwingen
         [DllImport("user32.dll")]
         static extern bool UpdateWindow(IntPtr hWnd);
 
-        // InvalidateRect, um das Fenster zum Neuzeichnen zu markieren
         [DllImport("user32.dll")]
         static extern bool InvalidateRect(IntPtr hWnd, IntPtr lpRect, bool bErase);
 
-        // P/Invoke: GetWindowRect, um die aktuelle Fensterposition und Größe zu ermitteln
         [DllImport("user32.dll")]
         private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
-        // Struktur für Fensterrechteck
+        // Import SetForegroundWindow to bring the window to the foreground.
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        // Structure for window rectangle.
         private struct RECT
         {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
+            public int Left, Top, Right, Bottom;
         }
 
+        #endregion
+
+        #region Constants
+
+        const int SW_SHOWNORMAL = 1;
+        const int GWL_STYLE = -16;
+        const int GWL_EXSTYLE = -20;
+        static readonly IntPtr WS_OVERLAPPEDWINDOW = new IntPtr(0x00CF0000);
+        const int WS_CAPTION = 0x00C00000;
+        const int WS_THICKFRAME = 0x00040000;
+        const int WS_EX_APPWINDOW = 0x00040000;
+
+        const int SWP_NOMOVE = 0x0002;
+        const int SWP_NOSIZE = 0x0001;
+        const int SWP_NOZORDER = 0x0004;
+        const int SWP_FRAMECHANGED = 0x0020;
+        const int SWP_SHOWWINDOW = 0x0040;
+
+        const uint RDW_INVALIDATE = 0x0001;
+        const uint RDW_ERASE = 0x0004;
+        const uint RDW_ALLCHILDREN = 0x0080;
+        const uint RDW_UPDATENOW = 0x0100;
+
+        #endregion
+
+        /// <summary>
+        /// Docking positions for window placement.
+        /// </summary>
         public enum DockPosition
         {
             TopLeft,
@@ -71,144 +95,86 @@ namespace Tomb_Raider_Resizer
             Center
         }
 
-
-        // Konstanten für die Fenster-Manipulation
-        const int SW_SHOWNORMAL = 1;
-        const int GWL_STYLE = -16;
-        const int GWL_EXSTYLE = -20;
-        static readonly IntPtr WS_OVERLAPPEDWINDOW = new IntPtr(0x00CF0000); // Standard-Windowed-Stil
-        const int WS_CAPTION = 0x00C00000;    // Titelleiste
-        const int WS_THICKFRAME = 0x00040000; // Größenändern-Rahmen
-        const int WS_EX_APPWINDOW = 0x00040000; // Sorgt dafür, dass das Fenster in der Taskleiste bleibt
-
-        const int SWP_NOMOVE = 0x0002;
-        const int SWP_NOSIZE = 0x0001;
-        const int SWP_NOZORDER = 0x0004;
-        const int SWP_FRAMECHANGED = 0x0020;
-
-        // Flags für RedrawWindow
-        const uint RDW_INVALIDATE = 0x0001;
-        const uint RDW_ERASE = 0x0004;
-        const uint RDW_ALLCHILDREN = 0x0080;
-        const uint RDW_UPDATENOW = 0x0100;
-
-        public static void ResizeWindow(string ProcessName, int x, int y, bool RemoveFrame, bool ForceWindowed)
+        /// <summary>
+        /// Resizes and repositions the window for the given process.
+        /// </summary>
+        public static void ResizeWindow(string processName, int width, int height, bool removeFrame, bool forceWindowed)
         {
-            // Prozess anhand des Namens suchen
-            var gameProcess = Process.GetProcessesByName(ProcessName).FirstOrDefault();
-            if (gameProcess == null)
-            {
+            var process = Process.GetProcessesByName(processName).FirstOrDefault();
+            if (process == null)
                 return;
-            }
 
-            // Fensterhandle ermitteln
-            IntPtr hwnd = gameProcess.MainWindowHandle;
+            IntPtr hwnd = process.MainWindowHandle;
             if (hwnd == IntPtr.Zero)
-            {
                 return;
-            }
 
-            // Falls der Windowed-Modus erzwungen werden soll:
-            if (ForceWindowed)
+            if (forceWindowed)
             {
-                // Setze den Fensterstil auf den Standard-Windowed-Stil
                 SetWindowLongPtrCompat(hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-
-                // Setze den Extended Style, damit das Fenster in der Taskleiste bleibt
-                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-                exStyle |= WS_EX_APPWINDOW;
+                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW;
                 SetWindowLongPtrCompat(hwnd, GWL_EXSTYLE, new IntPtr(exStyle));
-
-                // Mache das Fenster sichtbar
                 ShowWindow(hwnd, SW_SHOWNORMAL);
-
-                // Kurze Pause, damit der Prozess die Änderung verarbeiten kann
                 Thread.Sleep(100);
             }
 
-            // Falls der Rahmen entfernt werden soll:
-            if (RemoveFrame)
+            if (removeFrame)
             {
                 int style = GetWindowLong(hwnd, GWL_STYLE);
-                // Entferne die Bits für Titelleiste und dicken Rahmen
                 style &= ~(WS_CAPTION | WS_THICKFRAME);
                 SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(style));
 
-                // Optional: Auch hier den Extended Style anpassen, falls nötig
-                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-                exStyle |= WS_EX_APPWINDOW;
+                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW;
                 SetWindowLongPtrCompat(hwnd, GWL_EXSTYLE, new IntPtr(exStyle));
-
                 Thread.Sleep(100);
             }
 
-            // Fenstergröße anpassen
-            MoveWindow(hwnd, 0, 0, x, y, true);
-
-            // Änderungen übernehmen
+            MoveWindow(hwnd, 0, 0, width, height, true);
             SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0,
                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+            RefreshWindow(hwnd);
 
-            // Versuche, das Fenster zur Neuzeichnung zu zwingen
-            InvalidateRect(hwnd, IntPtr.Zero, true);
-            UpdateWindow(hwnd);
-            RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
-
-            // --- Flicker-Trick: Simuliere eine minimale Größenänderung ---
             Thread.Sleep(50);
-            MoveWindow(hwnd, 0, 0, x + 1, y + 1, true);
+            MoveWindow(hwnd, 0, 0, width + 1, height + 1, true);
             Thread.Sleep(20);
-            MoveWindow(hwnd, 0, 0, x, y, true);
+            MoveWindow(hwnd, 0, 0, width, height, true);
         }
 
         /// <summary>
-        /// Verschiebt das Fenster des angegebenen Prozesses (über seinen Namen) in den Arbeitsbereich des übergebenen Monitors.
-        /// Das Fenster wird im Arbeitsbereich (WorkingArea) des Monitors zentriert.
+        /// Moves the window of the specified process to the center of the given area.
         /// </summary>
-        /// <param name="ProcessName">Name des Prozesses</param>
-        /// <param name="workingArea">Der Arbeitsbereich (WorkingArea) des Zielmonitors</param>
-        public static void MoveWindowToMonitor(string ProcessName, Rectangle workingArea)
+        public static void MoveWindowToMonitor(string processName, Rectangle area)
         {
-            var gameProcess = Process.GetProcessesByName(ProcessName).FirstOrDefault();
-            if (gameProcess == null)
+            var process = Process.GetProcessesByName(processName).FirstOrDefault();
+            if (process == null)
                 return;
 
-            IntPtr hwnd = gameProcess.MainWindowHandle;
+            IntPtr hwnd = process.MainWindowHandle;
             if (hwnd == IntPtr.Zero)
                 return;
 
-            // Ermittele die aktuelle Fenstergröße
             if (!GetWindowRect(hwnd, out RECT rect))
                 return;
             int windowWidth = rect.Right - rect.Left;
             int windowHeight = rect.Bottom - rect.Top;
 
-            // Berechne neue, zentrierte Position im Arbeitsbereich
-            int newX = workingArea.Left + (workingArea.Width - windowWidth) / 2;
-            int newY = workingArea.Top + (workingArea.Height - windowHeight) / 2;
-
-            // Verschiebe das Fenster
+            int newX = area.Left + (area.Width - windowWidth) / 2;
+            int newY = area.Top + (area.Height - windowHeight) / 2;
             MoveWindow(hwnd, newX, newY, windowWidth, windowHeight, true);
         }
 
         /// <summary>
-        /// Verschiebt das Fenster des angegebenen Prozesses in den Arbeitsbereich (WorkingArea) des Zielmonitors
-        /// und dockt es an die gewünschte Position.
+        /// Docks the window to a specific position within the given area.
         /// </summary>
-        /// <param name="ProcessName">Name des Prozesses</param>
-        /// <param name="workingArea">Arbeitsbereich des Zielmonitors</param>
-        /// <param name="dockPos">Gewünschte Dock-Position</param>
-        public static void DockWindowToMonitor(string ProcessName, Rectangle workingArea, DockPosition dockPos)
+        public static void DockWindowToMonitor(string processName, Rectangle area, DockPosition dockPos)
         {
-            var gameProcess = Process.GetProcessesByName(ProcessName).FirstOrDefault();
-            if (gameProcess == null)
+            var process = Process.GetProcessesByName(processName).FirstOrDefault();
+            if (process == null)
                 return;
 
-            IntPtr hwnd = gameProcess.MainWindowHandle;
+            IntPtr hwnd = process.MainWindowHandle;
             if (hwnd == IntPtr.Zero)
                 return;
 
-            // Ermittele die aktuelle Fenstergröße
             if (!GetWindowRect(hwnd, out RECT rect))
                 return;
             int windowWidth = rect.Right - rect.Left;
@@ -218,111 +184,207 @@ namespace Tomb_Raider_Resizer
             switch (dockPos)
             {
                 case DockPosition.TopLeft:
-                    newX = workingArea.Left;
-                    newY = workingArea.Top;
+                    newX = area.Left;
+                    newY = area.Top;
                     break;
                 case DockPosition.TopRight:
-                    newX = workingArea.Right - windowWidth;
-                    newY = workingArea.Top;
+                    newX = area.Right - windowWidth;
+                    newY = area.Top;
                     break;
                 case DockPosition.BottomLeft:
-                    newX = workingArea.Left;
-                    newY = workingArea.Bottom - windowHeight;
+                    newX = area.Left;
+                    newY = area.Bottom - windowHeight;
                     break;
                 case DockPosition.BottomRight:
-                    newX = workingArea.Right - windowWidth;
-                    newY = workingArea.Bottom - windowHeight;
+                    newX = area.Right - windowWidth;
+                    newY = area.Bottom - windowHeight;
                     break;
                 case DockPosition.Center:
                 default:
-                    newX = workingArea.Left + (workingArea.Width - windowWidth) / 2;
-                    newY = workingArea.Top + (workingArea.Height - windowHeight) / 2;
+                    newX = area.Left + (area.Width - windowWidth) / 2;
+                    newY = area.Top + (area.Height - windowHeight) / 2;
                     break;
             }
 
-            // Fenster verschieben
             MoveWindow(hwnd, newX, newY, windowWidth, windowHeight, true);
             SetWindowPos(hwnd, IntPtr.Zero, newX, newY, 0, 0,
                 SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
         }
 
-        public static void ResizeWindow(string ProcessName, int x, int y, bool RemoveFrame, bool ForceWindowed, Rectangle workingArea, DockPosition dockPos)
+        /// <summary>
+        /// Resizes the window and then docks it to the desired position within the given area.
+        /// </summary>
+        public static void ResizeWindow(string processName, int width, int height, bool removeFrame, bool forceWindowed, Rectangle area, DockPosition dockPos)
         {
-            // (Vorherige Logik: Fenster vorbereiten, z.B. Windowed-Mode erzwingen, Rahmen entfernen etc.)
-            var gameProcess = Process.GetProcessesByName(ProcessName).FirstOrDefault();
-            if (gameProcess == null)
+            var process = Process.GetProcessesByName(processName).FirstOrDefault();
+            if (process == null)
                 return;
 
-            IntPtr hwnd = gameProcess.MainWindowHandle;
+            IntPtr hwnd = process.MainWindowHandle;
             if (hwnd == IntPtr.Zero)
                 return;
 
-            if (ForceWindowed)
+            if (forceWindowed)
             {
                 SetWindowLongPtrCompat(hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-                exStyle |= WS_EX_APPWINDOW;
+                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW;
                 SetWindowLongPtrCompat(hwnd, GWL_EXSTYLE, new IntPtr(exStyle));
                 ShowWindow(hwnd, SW_SHOWNORMAL);
                 Thread.Sleep(100);
             }
 
-            if (RemoveFrame)
+            if (removeFrame)
             {
-                int style = GetWindowLong(hwnd, GWL_STYLE);
-                style &= ~(WS_CAPTION | WS_THICKFRAME);
+                int style = GetWindowLong(hwnd, GWL_STYLE) & ~(WS_CAPTION | WS_THICKFRAME);
                 SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(style));
-                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-                exStyle |= WS_EX_APPWINDOW;
+                int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW;
                 SetWindowLongPtrCompat(hwnd, GWL_EXSTYLE, new IntPtr(exStyle));
                 Thread.Sleep(100);
             }
 
-            // Neue Position basierend auf der gewünschten Docking-Position berechnen:
             int newX, newY;
             switch (dockPos)
             {
                 case DockPosition.TopLeft:
-                    newX = workingArea.Left;
-                    newY = workingArea.Top;
+                    newX = area.Left;
+                    newY = area.Top;
                     break;
                 case DockPosition.TopRight:
-                    newX = workingArea.Right - x;
-                    newY = workingArea.Top;
+                    newX = area.Right - width;
+                    newY = area.Top;
                     break;
                 case DockPosition.BottomLeft:
-                    newX = workingArea.Left;
-                    newY = workingArea.Bottom - y;
+                    newX = area.Left;
+                    newY = area.Bottom - height;
                     break;
                 case DockPosition.BottomRight:
-                    newX = workingArea.Right - x;
-                    newY = workingArea.Bottom - y;
+                    newX = area.Right - width;
+                    newY = area.Bottom - height;
                     break;
                 case DockPosition.Center:
                 default:
-                    newX = workingArea.Left + (workingArea.Width - x) / 2;
-                    newY = workingArea.Top + (workingArea.Height - y) / 2;
+                    newX = area.Left + (area.Width - width) / 2;
+                    newY = area.Top + (area.Height - height) / 2;
                     break;
             }
 
-            // Fenstergröße und Position anpassen
-            MoveWindow(hwnd, newX, newY, x, y, true);
-
-            // Änderungen übernehmen
+            MoveWindow(hwnd, newX, newY, width, height, true);
             SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0,
                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+            RefreshWindow(hwnd);
+
+            Thread.Sleep(50);
+            MoveWindow(hwnd, newX, newY, width + 1, height + 1, true);
+            Thread.Sleep(20);
+            MoveWindow(hwnd, newX, newY, width, height, true);
+        }
+
+        /// <summary>
+        /// Sets the window to borderless fullscreen mode.
+        /// This method configures the window to cover the entire monitor (using Screen.Bounds),
+        /// sets the window style to WS_POPUP (removing borders and title bar),
+        /// and positions the window without forcing it topmost so that andere Fenster bei Fokuswechsel 
+        /// darübergebracht werden können.
+        /// </summary>
+        /// <param name="processName">Name of the process.</param>
+        /// <param name="removeFrame">Ignored in fullscreen mode.</param>
+        /// <param name="forceWindowed">Ignored in fullscreen mode.</param>
+        /// <param name="bounds">The full bounds of the target monitor (use Screen.AllScreens[…].Bounds).</param>
+        public static void BorderlessFullscreenWindow(string processName, bool removeFrame, bool forceWindowed, Rectangle bounds)
+        {
+            var process = Process.GetProcessesByName(processName).FirstOrDefault();
+            if (process == null)
+                return;
+
+            IntPtr hwnd = process.MainWindowHandle;
+            if (hwnd == IntPtr.Zero)
+                return;
+
+            // Set window style to WS_POPUP (no borders, no title bar)
+            const int WS_POPUP = unchecked((int)0x80000000);
+            SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(WS_POPUP));
+
+            // Remove any topmost flag so that other windows can be placed above when not active.
+            int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) & ~0x00000008; // Remove WS_EX_TOPMOST (0x00000008)
+            exStyle |= WS_EX_APPWINDOW;
+            SetWindowLongPtrCompat(hwnd, GWL_EXSTYLE, new IntPtr(exStyle));
+
+            // Show the window.
+            ShowWindow(hwnd, SW_SHOWNORMAL);
+            Thread.Sleep(100);
+
+            // Set window bounds to cover the entire monitor (including Taskbar area).
+            int x = bounds.Left;
+            int y = bounds.Top;
+            int width = bounds.Width;
+            int height = bounds.Height;
+
+            // Use HWND_NOTOPMOST (-2) so the window is not forced above all others.
+            IntPtr HWND_NOTOPMOST = new IntPtr(-2);
+            SetWindowPos(hwnd, HWND_NOTOPMOST, x, y, width, height, SWP_SHOWWINDOW | SWP_FRAMECHANGED);
+            RefreshWindow(hwnd);
+
+            // Bring the window to the foreground.
+            SetForegroundWindow(hwnd);
+
+            Thread.Sleep(50);
+            MoveWindow(hwnd, x, y, width + 1, height + 1, true);
+            Thread.Sleep(20);
+            MoveWindow(hwnd, x, y, width, height, true);
+        }
+
+        /// <summary>
+        /// Forces the window to refresh its display.
+        /// </summary>
+        /// <param name="hwnd">Handle of the window.</param>
+        private static void RefreshWindow(IntPtr hwnd)
+        {
             InvalidateRect(hwnd, IntPtr.Zero, true);
             UpdateWindow(hwnd);
             RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
-
-            // --- Flicker-Trick: minimale Größenänderung simulieren ---
-            Thread.Sleep(50);
-            MoveWindow(hwnd, newX, newY, x + 1, y + 1, true);
-            Thread.Sleep(20);
-            MoveWindow(hwnd, newX, newY, x, y, true);
         }
 
+        #region Display Settings API
 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct DEVMODE
+        {
+            private const int CCHDEVICENAME = 32;
+            private const int CCHFORMNAME = 32;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
+            public string dmDeviceName;
+            public short dmSpecVersion;
+            public short dmDriverVersion;
+            public short dmSize;
+            public short dmDriverExtra;
+            public int dmFields;
+            public int dmPositionX;
+            public int dmPositionY;
+            public int dmDisplayOrientation;
+            public int dmDisplayFixedOutput;
+            public short dmColor;
+            public short dmDuplex;
+            public short dmYResolution;
+            public short dmTTOption;
+            public short dmCollate;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHFORMNAME)]
+            public string dmFormName;
+            public short dmLogPixels;
+            public int dmBitsPerPel;
+            public int dmPelsWidth;
+            public int dmPelsHeight;
+            public int dmDisplayFlags;
+            public int dmDisplayFrequency;
+            public int dmICMMethod;
+            public int dmICMIntent;
+            public int dmMediaType;
+            public int dmDitherType;
+            public int dmReserved1;
+            public int dmReserved2;
+            public int dmPanningWidth;
+            public int dmPanningHeight;
+        }
 
+        #endregion
     }
 }
