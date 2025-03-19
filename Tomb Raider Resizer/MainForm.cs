@@ -139,6 +139,7 @@ namespace TombRaiderResizer
             lblNote.Enabled = isProcessFound;
             lblWidth.Enabled = isProcessFound;
             lblHeight.Enabled = isProcessFound;
+            lblWindowExtras.Enabled = isProcessFound;
         }
 
         /// <summary>
