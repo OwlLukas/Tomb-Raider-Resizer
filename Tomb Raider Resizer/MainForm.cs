@@ -5,6 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using Tomb_Raider_Resizer.Properties;
 
 namespace TombRaiderResizer
 {
@@ -20,6 +23,7 @@ namespace TombRaiderResizer
         public MainForm()
         {
             InitializeComponent();
+            ApplySystemTheme(); // Passe das Thema beim Start an.
 
             // Set a fixed dialog style for a cleaner UI.
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -48,6 +52,78 @@ namespace TombRaiderResizer
             if (cmbGameList.SelectedItem is GameInfo initialGame)
             {
                 StartProcessCheck(initialGame);
+            }
+        }
+
+        /// <summary>
+        /// Prüft anhand der Registry, ob Windows im hellen Modus ist.
+        /// Gibt true zurück, wenn "AppsUseLightTheme" auf 1 steht (hell), ansonsten false (dunkel).
+        /// </summary>
+        private bool IsLightTheme()
+        {
+            object registryValue = Registry.GetValue(
+                @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+                "AppsUseLightTheme", 1);
+            if (registryValue is int value)
+            {
+                return value == 1;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Passt die Farben des Formulars und seiner Controls entsprechend dem Systemthema an.
+        /// </summary>
+        private void ApplySystemTheme()
+        {
+            if (IsLightTheme())
+            {
+                // Heller Modus
+                this.BackColor = Color.White;
+                this.ForeColor = Color.Black;
+                // Weitere Anpassungen, z. B. Panel-Farben, können hier ergänzt werden.
+            }
+            else
+            {
+                // Dunkler Modus – typisches Windows-Dunkelgrau
+                this.BackColor = Color.FromArgb(45, 45, 48);
+                this.ForeColor = Color.White;
+            }
+        }
+
+        /// <summary>
+        /// Überschreibt WndProc, um auf WM_SETTINGCHANGE zu reagieren (Thema-Wechsel).
+        /// </summary>
+        /// <param name="m">Das Nachrichtenobjekt.</param>
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_SETTINGCHANGE = 0x001A;
+            if (m.Msg == WM_SETTINGCHANGE)
+            {
+                string param = Marshal.PtrToStringUni(m.LParam);
+                if (!string.IsNullOrEmpty(param) &&
+                    (param.Contains("AppsUseLightTheme") || param.Contains("ImmersiveColorSet")))
+                {
+                    ApplySystemTheme();
+                }
+            }
+            base.WndProc(ref m);
+        }
+
+        /// <summary>
+        /// Sets the process status icon in the PictureBox using resources.
+        /// Skalierte das grüne Icon auf 24x24 Pixel.
+        /// </summary>
+        private void SetProcessStatusIcon(Image img)
+        {
+            if (img == Tomb_Raider_Resizer.Properties.Resources.greenCheckmark)
+            {
+                Bitmap resized = new Bitmap(img, new Size(24, 24));
+                pbProcess.Image = resized;
+            }
+            else
+            {
+                pbProcess.Image = img;
             }
         }
 
@@ -95,7 +171,7 @@ namespace TombRaiderResizer
             cmbDockPosition.Items.Add("Bottom Right");
             cmbDockPosition.Items.Add("Center");
             cmbDockPosition.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbDockPosition.SelectedIndex = 4; // Default to Center.
+            cmbDockPosition.SelectedIndex = 4;
             cmbDockPosition.SelectedIndexChanged += cmbDockPosition_SelectedIndexChanged;
         }
 
@@ -106,24 +182,18 @@ namespace TombRaiderResizer
         {
             if (rbFullscreen.Checked)
             {
-                // In fullscreen mode, width and height are not needed.
                 txtWidth.Enabled = false;
                 txtHeight.Enabled = false;
-                // Force docking to Center and disable docking combobox.
                 cmbDockPosition.SelectedIndex = 4;
                 cmbDockPosition.Enabled = false;
-                // Disable the "Remove Window Frame" checkbox.
                 chkRemoveFrame.Enabled = false;
-                // The resize button is enabled as soon as a process is found.
                 btnResize.Enabled = isProcessFound;
             }
             else
             {
-                // In non-fullscreen mode, validate width and height.
                 txtWidth.Enabled = isProcessFound;
                 txtHeight.Enabled = isProcessFound;
                 cmbDockPosition.Enabled = isProcessFound;
-                // Re-enable the "Remove Window Frame" checkbox.
                 chkRemoveFrame.Enabled = isProcessFound;
                 bool validInputs = int.TryParse(txtWidth.Text, out _) && int.TryParse(txtHeight.Text, out _);
                 btnResize.Enabled = validInputs && isProcessFound;
@@ -154,10 +224,8 @@ namespace TombRaiderResizer
                 txtHeight.Text = "";
                 txtWidth.Enabled = false;
                 txtHeight.Enabled = false;
-                // Disable docking options and force Center.
                 cmbDockPosition.SelectedIndex = 4;
                 cmbDockPosition.Enabled = false;
-                // Disable the "Remove Window Frame" checkbox.
                 chkRemoveFrame.Enabled = false;
             }
             else
@@ -184,20 +252,34 @@ namespace TombRaiderResizer
         }
 
         /// <summary>
-        /// Timer tick event that checks for the process.
+        /// Timer tick event that checks for the process and updates the status icon.
+        /// Zeigt solange "Searching..." an, bis der Prozess gefunden wird.
         /// </summary>
         private void ProcessCheckTimer_Tick(object sender, EventArgs e)
         {
             if (!(cmbGameList.SelectedItem is GameInfo game))
                 return;
 
+            // Zeige während der Suche das Lade-GIF.
+            SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
+
             Task.Run(() =>
             {
                 bool processFound = game.ProcessNames.Any(procName => Process.GetProcessesByName(procName).Length > 0);
                 this.BeginInvoke((Action)(() =>
                 {
-                    isProcessFound = processFound;
-                    lblProcessStatus.Text = processFound ? "Process Found!" : "Not Connected!";
+                    if (processFound)
+                    {
+                        isProcessFound = true;
+                        lblProcessStatus.Text = "Process Found!";
+                        SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.greenCheckmark);
+                    }
+                    else
+                    {
+                        isProcessFound = false;
+                        lblProcessStatus.Text = "Searching...";
+                        SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
+                    }
                     UpdateControlStates();
                 }));
             });
@@ -216,13 +298,12 @@ namespace TombRaiderResizer
 
         /// <summary>
         /// Handles the monitor selection change event.
-        /// Moves the game window to the selected monitor.
+        /// If fullscreen is active, adjusts the window to the new monitor bounds; otherwise, moves the window.
         /// </summary>
         private void cmbMonitor_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (rbFullscreen.Checked)
             {
-                // Im Fullscreen-Modus: Passe das Fenster an den neuen Monitor an.
                 int monitorIndex = cmbMonitor.SelectedIndex;
                 Rectangle bounds = Screen.AllScreens[monitorIndex].Bounds;
                 if (cmbGameList.SelectedItem is GameInfo selectedGame)
@@ -231,14 +312,12 @@ namespace TombRaiderResizer
                     if (!string.IsNullOrEmpty(processName))
                     {
                         bool removeFrame = chkRemoveFrame.Checked;
-                        // Aktualisiere das Fenster im Borderless-Fullscreen-Modus auf dem neuen Monitor.
                         ResizeHelper.BorderlessFullscreenWindow(processName, removeFrame, false, bounds);
                     }
                 }
             }
             else
             {
-                // Normaler Modus: Verschiebe das Fenster in den Arbeitsbereich des neuen Monitors.
                 MoveGameWindowToSelectedMonitor();
             }
         }
@@ -287,7 +366,7 @@ namespace TombRaiderResizer
 
         /// <summary>
         /// Handles the click event for the resize button.
-        /// In Fullscreen mode, executes the same action as Alt+Enter.
+        /// In Fullscreen mode, executes the same action as Alt+Enter (Borderless Fullscreen).
         /// In non-fullscreen mode, performs the standard resize with docking.
         /// </summary>
         private void btnResize_Click(object sender, EventArgs e)
@@ -304,7 +383,6 @@ namespace TombRaiderResizer
 
             if (rbFullscreen.Checked)
             {
-                // Fullscreen: Emulate Alt+Enter behavior using Borderless Fullscreen.
                 Rectangle bounds = Screen.AllScreens[monitorIndex].Bounds;
                 ResizeHelper.BorderlessFullscreenWindow(selectedGame.ProcessNames.FirstOrDefault(), removeFrame, false, bounds);
             }

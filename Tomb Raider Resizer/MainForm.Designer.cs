@@ -6,6 +6,7 @@
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.ToolTip toolTip1; // ToolTip hinzufügen
 
         /// <summary>
         /// Clean up any resources being used.
@@ -22,7 +23,10 @@
 
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container(); // Falls noch nicht vorhanden
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components); // Instanziiere toolTip1
+
             this.lblGameSelect = new System.Windows.Forms.Label();
             this.cmbGameList = new System.Windows.Forms.ComboBox();
             this.lblResolution = new System.Windows.Forms.Label();
@@ -36,16 +40,18 @@
             this.lblProcessStatusLabel = new System.Windows.Forms.Label();
             this.lblProcessStatus = new System.Windows.Forms.Label();
             this.pnlGameSelection = new System.Windows.Forms.Panel();
+            this.pbProcess = new System.Windows.Forms.PictureBox();
             this.pnlOptions = new System.Windows.Forms.Panel();
+            this.lblWindowExtras = new System.Windows.Forms.Label();
+            this.rbForceWindowed = new System.Windows.Forms.RadioButton();
             this.lblDocking = new System.Windows.Forms.Label();
+            this.rbFullscreen = new System.Windows.Forms.RadioButton();
             this.cmbDockPosition = new System.Windows.Forms.ComboBox();
             this.lblNote = new System.Windows.Forms.Label();
             this.lblMonitor = new System.Windows.Forms.Label();
             this.cmbMonitor = new System.Windows.Forms.ComboBox();
-            this.rbForceWindowed = new System.Windows.Forms.RadioButton();
-            this.rbFullscreen = new System.Windows.Forms.RadioButton();
-            this.lblWindowExtras = new System.Windows.Forms.Label();
             this.pnlGameSelection.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbProcess)).BeginInit();
             this.pnlOptions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,6 +63,7 @@
             this.lblGameSelect.Size = new System.Drawing.Size(89, 15);
             this.lblGameSelect.TabIndex = 1;
             this.lblGameSelect.Text = "Choose Game:";
+            this.toolTip1.SetToolTip(this.lblGameSelect, "Select a game.");
             // 
             // cmbGameList
             // 
@@ -65,6 +72,7 @@
             this.cmbGameList.Name = "cmbGameList";
             this.cmbGameList.Size = new System.Drawing.Size(359, 21);
             this.cmbGameList.TabIndex = 2;
+            this.toolTip1.SetToolTip(this.cmbGameList, "Choose a game from the list.");
             // 
             // lblResolution
             // 
@@ -74,6 +82,7 @@
             this.lblResolution.Size = new System.Drawing.Size(69, 15);
             this.lblResolution.TabIndex = 3;
             this.lblResolution.Text = "Resolution:";
+            this.toolTip1.SetToolTip(this.lblResolution, "Display resolution.");
             // 
             // txtWidth
             // 
@@ -81,6 +90,7 @@
             this.txtWidth.Name = "txtWidth";
             this.txtWidth.Size = new System.Drawing.Size(52, 20);
             this.txtWidth.TabIndex = 4;
+            this.toolTip1.SetToolTip(this.txtWidth, "Width in pixels.");
             // 
             // txtHeight
             // 
@@ -88,6 +98,7 @@
             this.txtHeight.Name = "txtHeight";
             this.txtHeight.Size = new System.Drawing.Size(52, 20);
             this.txtHeight.TabIndex = 5;
+            this.toolTip1.SetToolTip(this.txtHeight, "Height in pixels.");
             // 
             // lblWidth
             // 
@@ -97,6 +108,7 @@
             this.lblWidth.Size = new System.Drawing.Size(41, 15);
             this.lblWidth.TabIndex = 6;
             this.lblWidth.Text = "Width:";
+            this.toolTip1.SetToolTip(this.lblWidth, "Width (px).");
             // 
             // lblHeight
             // 
@@ -106,6 +118,7 @@
             this.lblHeight.Size = new System.Drawing.Size(46, 15);
             this.lblHeight.TabIndex = 7;
             this.lblHeight.Text = "Height:";
+            this.toolTip1.SetToolTip(this.lblHeight, "Height (px).");
             // 
             // lblWindowOptions
             // 
@@ -115,16 +128,18 @@
             this.lblWindowOptions.Size = new System.Drawing.Size(99, 15);
             this.lblWindowOptions.TabIndex = 10;
             this.lblWindowOptions.Text = "Window Options:";
+            this.toolTip1.SetToolTip(this.lblWindowOptions, "Window options.");
             // 
             // btnResize
             // 
-            this.btnResize.Location = new System.Drawing.Point(160, 274);
+            this.btnResize.Location = new System.Drawing.Point(205, 262);
             this.btnResize.Name = "btnResize";
             this.btnResize.Size = new System.Drawing.Size(135, 35);
             this.btnResize.TabIndex = 11;
             this.btnResize.Text = "Resize";
             this.btnResize.UseVisualStyleBackColor = true;
             this.btnResize.Click += new System.EventHandler(this.btnResize_Click);
+            this.toolTip1.SetToolTip(this.btnResize, "Apply changes.");
             // 
             // chkRemoveFrame
             // 
@@ -135,6 +150,7 @@
             this.chkRemoveFrame.TabIndex = 16;
             this.chkRemoveFrame.Text = "Remove Window Frame";
             this.chkRemoveFrame.UseVisualStyleBackColor = true;
+            this.toolTip1.SetToolTip(this.chkRemoveFrame, "Remove window border.");
             // 
             // lblProcessStatusLabel
             // 
@@ -144,6 +160,7 @@
             this.lblProcessStatusLabel.Size = new System.Drawing.Size(91, 15);
             this.lblProcessStatusLabel.TabIndex = 17;
             this.lblProcessStatusLabel.Text = "Process Status:";
+            this.toolTip1.SetToolTip(this.lblProcessStatusLabel, "Process status.");
             // 
             // lblProcessStatus
             // 
@@ -153,10 +170,12 @@
             this.lblProcessStatus.Size = new System.Drawing.Size(132, 15);
             this.lblProcessStatus.TabIndex = 18;
             this.lblProcessStatus.Text = "Scanning for Process...";
+            this.toolTip1.SetToolTip(this.lblProcessStatus, "Current process status.");
             // 
             // pnlGameSelection
             // 
             this.pnlGameSelection.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlGameSelection.Controls.Add(this.pbProcess);
             this.pnlGameSelection.Controls.Add(this.lblGameSelect);
             this.pnlGameSelection.Controls.Add(this.lblProcessStatus);
             this.pnlGameSelection.Controls.Add(this.cmbGameList);
@@ -165,6 +184,15 @@
             this.pnlGameSelection.Name = "pnlGameSelection";
             this.pnlGameSelection.Size = new System.Drawing.Size(525, 62);
             this.pnlGameSelection.TabIndex = 19;
+            // 
+            // pbProcess
+            // 
+            this.pbProcess.Location = new System.Drawing.Point(195, 32);
+            this.pbProcess.Name = "pbProcess";
+            this.pbProcess.Size = new System.Drawing.Size(48, 25);
+            this.pbProcess.TabIndex = 26;
+            this.pbProcess.TabStop = false;
+            this.toolTip1.SetToolTip(this.pbProcess, "Process status icon.");
             // 
             // pnlOptions
             // 
@@ -186,51 +214,18 @@
             this.pnlOptions.Controls.Add(this.lblWindowOptions);
             this.pnlOptions.Location = new System.Drawing.Point(9, 76);
             this.pnlOptions.Name = "pnlOptions";
-            this.pnlOptions.Size = new System.Drawing.Size(525, 192);
+            this.pnlOptions.Size = new System.Drawing.Size(525, 180);
             this.pnlOptions.TabIndex = 20;
             // 
-            // lblDocking
+            // lblWindowExtras
             // 
-            this.lblDocking.AutoSize = true;
-            this.lblDocking.Location = new System.Drawing.Point(8, 33);
-            this.lblDocking.Name = "lblDocking";
-            this.lblDocking.Size = new System.Drawing.Size(102, 15);
-            this.lblDocking.TabIndex = 25;
-            this.lblDocking.Text = "Docking Position:";
-            // 
-            // cmbDockPosition
-            // 
-            this.cmbDockPosition.FormattingEnabled = true;
-            this.cmbDockPosition.Location = new System.Drawing.Point(101, 31);
-            this.cmbDockPosition.Name = "cmbDockPosition";
-            this.cmbDockPosition.Size = new System.Drawing.Size(123, 21);
-            this.cmbDockPosition.TabIndex = 23;
-            // 
-            // lblNote
-            // 
-            this.lblNote.AutoSize = true;
-            this.lblNote.Location = new System.Drawing.Point(8, 158);
-            this.lblNote.Name = "lblNote";
-            this.lblNote.Size = new System.Drawing.Size(446, 15);
-            this.lblNote.TabIndex = 24;
-            this.lblNote.Text = "Note: You can still use ALT+Enter to manually toggle full screen or window mode.";
-            // 
-            // lblMonitor
-            // 
-            this.lblMonitor.AutoSize = true;
-            this.lblMonitor.Location = new System.Drawing.Point(8, 9);
-            this.lblMonitor.Name = "lblMonitor";
-            this.lblMonitor.Size = new System.Drawing.Size(52, 15);
-            this.lblMonitor.TabIndex = 22;
-            this.lblMonitor.Text = "Monitor:";
-            // 
-            // cmbMonitor
-            // 
-            this.cmbMonitor.FormattingEnabled = true;
-            this.cmbMonitor.Location = new System.Drawing.Point(101, 6);
-            this.cmbMonitor.Name = "cmbMonitor";
-            this.cmbMonitor.Size = new System.Drawing.Size(244, 21);
-            this.cmbMonitor.TabIndex = 21;
+            this.lblWindowExtras.AutoSize = true;
+            this.lblWindowExtras.Location = new System.Drawing.Point(8, 116);
+            this.lblWindowExtras.Name = "lblWindowExtras";
+            this.lblWindowExtras.Size = new System.Drawing.Size(91, 15);
+            this.lblWindowExtras.TabIndex = 21;
+            this.lblWindowExtras.Text = "Window Extras:";
+            this.toolTip1.SetToolTip(this.lblWindowExtras, "Additional window options.");
             // 
             // rbForceWindowed
             // 
@@ -242,6 +237,17 @@
             this.rbForceWindowed.TabStop = true;
             this.rbForceWindowed.Text = "Force Windowed Mode";
             this.rbForceWindowed.UseVisualStyleBackColor = true;
+            this.toolTip1.SetToolTip(this.rbForceWindowed, "Force windowed mode.");
+            // 
+            // lblDocking
+            // 
+            this.lblDocking.AutoSize = true;
+            this.lblDocking.Location = new System.Drawing.Point(8, 33);
+            this.lblDocking.Name = "lblDocking";
+            this.lblDocking.Size = new System.Drawing.Size(102, 15);
+            this.lblDocking.TabIndex = 25;
+            this.lblDocking.Text = "Docking Position:";
+            this.toolTip1.SetToolTip(this.lblDocking, "Select docking position.");
             // 
             // rbFullscreen
             // 
@@ -253,19 +259,49 @@
             this.rbFullscreen.TabStop = true;
             this.rbFullscreen.Text = "Fullscreen";
             this.rbFullscreen.UseVisualStyleBackColor = true;
+            this.toolTip1.SetToolTip(this.rbFullscreen, "Enable fullscreen mode.");
             // 
-            // lblWindowExtras
+            // cmbDockPosition
             // 
-            this.lblWindowExtras.AutoSize = true;
-            this.lblWindowExtras.Location = new System.Drawing.Point(8, 116);
-            this.lblWindowExtras.Name = "lblWindowExtras";
-            this.lblWindowExtras.Size = new System.Drawing.Size(91, 15);
-            this.lblWindowExtras.TabIndex = 21;
-            this.lblWindowExtras.Text = "Window Extras:";
+            this.cmbDockPosition.FormattingEnabled = true;
+            this.cmbDockPosition.Location = new System.Drawing.Point(101, 31);
+            this.cmbDockPosition.Name = "cmbDockPosition";
+            this.cmbDockPosition.Size = new System.Drawing.Size(123, 21);
+            this.cmbDockPosition.TabIndex = 23;
+            this.toolTip1.SetToolTip(this.cmbDockPosition, "Choose window docking position.");
+            // 
+            // lblNote
+            // 
+            this.lblNote.AutoSize = true;
+            this.lblNote.Location = new System.Drawing.Point(8, 148);
+            this.lblNote.Name = "lblNote";
+            this.lblNote.Size = new System.Drawing.Size(446, 15);
+            this.lblNote.TabIndex = 24;
+            this.lblNote.Text = "Note: You can still use ALT+Enter to manually toggle full screen or window mode.";
+            this.toolTip1.SetToolTip(this.lblNote, "Tip: Use ALT+Enter to toggle full screen.");
+            // 
+            // lblMonitor
+            // 
+            this.lblMonitor.AutoSize = true;
+            this.lblMonitor.Location = new System.Drawing.Point(8, 9);
+            this.lblMonitor.Name = "lblMonitor";
+            this.lblMonitor.Size = new System.Drawing.Size(52, 15);
+            this.lblMonitor.TabIndex = 22;
+            this.lblMonitor.Text = "Monitor:";
+            this.toolTip1.SetToolTip(this.lblMonitor, "Select monitor.");
+            // 
+            // cmbMonitor
+            // 
+            this.cmbMonitor.FormattingEnabled = true;
+            this.cmbMonitor.Location = new System.Drawing.Point(101, 6);
+            this.cmbMonitor.Name = "cmbMonitor";
+            this.cmbMonitor.Size = new System.Drawing.Size(244, 21);
+            this.cmbMonitor.TabIndex = 21;
+            this.toolTip1.SetToolTip(this.cmbMonitor, "Choose target monitor.");
             // 
             // MainForm
             // 
-            this.ClientSize = new System.Drawing.Size(546, 317);
+            this.ClientSize = new System.Drawing.Size(546, 305);
             this.Controls.Add(this.pnlOptions);
             this.Controls.Add(this.pnlGameSelection);
             this.Controls.Add(this.btnResize);
@@ -274,10 +310,10 @@
             this.Text = "Tomb Raider Resizer";
             this.pnlGameSelection.ResumeLayout(false);
             this.pnlGameSelection.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbProcess)).EndInit();
             this.pnlOptions.ResumeLayout(false);
             this.pnlOptions.PerformLayout();
             this.ResumeLayout(false);
-
         }
 
         #endregion
@@ -304,5 +340,6 @@
         private System.Windows.Forms.RadioButton rbForceWindowed;
         private System.Windows.Forms.RadioButton rbFullscreen;
         private System.Windows.Forms.Label lblWindowExtras;
+        private System.Windows.Forms.PictureBox pbProcess;
     }
 }
