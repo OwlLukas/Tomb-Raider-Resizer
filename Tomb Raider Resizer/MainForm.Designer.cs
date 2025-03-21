@@ -114,7 +114,7 @@
             // lblProcessStatusLabel
             // 
             this.lblProcessStatusLabel.AutoSize = true;
-            this.lblProcessStatusLabel.Location = new System.Drawing.Point(6, 48);
+            this.lblProcessStatusLabel.Location = new System.Drawing.Point(6, 52);
             this.lblProcessStatusLabel.Name = "lblProcessStatusLabel";
             this.lblProcessStatusLabel.Size = new System.Drawing.Size(81, 13);
             this.lblProcessStatusLabel.TabIndex = 17;
@@ -124,7 +124,7 @@
             // lblProcessStatus
             // 
             this.lblProcessStatus.AutoSize = true;
-            this.lblProcessStatus.Location = new System.Drawing.Point(105, 48);
+            this.lblProcessStatus.Location = new System.Drawing.Point(105, 52);
             this.lblProcessStatus.Name = "lblProcessStatus";
             this.lblProcessStatus.Size = new System.Drawing.Size(117, 13);
             this.lblProcessStatus.TabIndex = 18;
@@ -133,7 +133,7 @@
             // 
             // pbProcess
             // 
-            this.pbProcess.Location = new System.Drawing.Point(218, 44);
+            this.pbProcess.Location = new System.Drawing.Point(215, 46);
             this.pbProcess.Name = "pbProcess";
             this.pbProcess.Size = new System.Drawing.Size(35, 25);
             this.pbProcess.TabIndex = 26;

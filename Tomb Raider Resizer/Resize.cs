@@ -88,6 +88,11 @@ namespace Tomb_Raider_Resizer
             Center
         }
 
+        /// <summary>
+        /// Ändert die Fenstergröße und -position des angegebenen Prozesses.
+        /// Wird "Remove Window Frame" aktiviert, wird der Fensterstil explizit auf WS_POPUP gesetzt und das Fenster mehrfach neu gezeichnet.
+        /// Diese Logik wird nun einheitlich für alle Auflösungsmodi (Custom, 16:9, 4:3) angewandt.
+        /// </summary>
         public static void ResizeWindow(string processName, int width, int height, bool removeFrame, bool forceWindowed, Rectangle area, DockPosition dockPos, bool skipFlicker = false)
         {
             var process = Process.GetProcessesByName(processName).FirstOrDefault();
@@ -97,11 +102,12 @@ namespace Tomb_Raider_Resizer
             if (hwnd == IntPtr.Zero)
                 return;
 
-            // Windowed Mode: Wenn Remove Frame aktiv ist, Rahmen entfernen.
+            // Setze den Fensterstil je nach Modus und ob der Rahmen entfernt werden soll.
             if (forceWindowed)
             {
                 if (removeFrame)
                 {
+                    // Entferne Rahmen: WS_CAPTION, WS_THICKFRAME und WS_BORDER
                     int style = GetWindowLong(hwnd, GWL_STYLE) & ~(WS_CAPTION | WS_THICKFRAME | WS_BORDER);
                     SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(style));
                     int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW;
@@ -137,6 +143,7 @@ namespace Tomb_Raider_Resizer
                 }
             }
 
+            // Berechne die neue Position basierend auf der gewählten Docking-Position.
             int newX, newY;
             switch (dockPos)
             {
@@ -163,6 +170,7 @@ namespace Tomb_Raider_Resizer
                     break;
             }
 
+            // Setze Fenstergröße und -position.
             MoveWindow(hwnd, newX, newY, width, height, true);
             SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0,
                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
@@ -176,13 +184,18 @@ namespace Tomb_Raider_Resizer
                 MoveWindow(hwnd, newX, newY, width, height, true);
             }
 
-            // Falls Remove Frame aktiv ist, wird hier nochmals der Fensterbereich exakt gesetzt
-            // – in diesem Fall wird zusätzlich ShowWindow aufgerufen, um den Clientbereich korrekt neu zu zeichnen.
+            // Wenn "Remove Window Frame" aktiviert ist, setze nun den WS_POPUP-Stil und aktualisiere das Fenster
+            // – dies entspricht exakt der Logik, die bei 16:9 und 4:3 funktioniert.
             if (removeFrame)
             {
-                ShowWindow(hwnd, SW_SHOWNORMAL);
-                MoveWindow(hwnd, newX, newY, width, height, true);
+                SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(unchecked((int)0x80000000))); // WS_POPUP
+                SetWindowPos(hwnd, IntPtr.Zero, newX, newY, width, height, SWP_SHOWWINDOW | SWP_FRAMECHANGED);
                 RefreshWindow(hwnd);
+                SetForegroundWindow(hwnd);
+                Thread.Sleep(50);
+                MoveWindow(hwnd, newX, newY, width + 1, height + 1, true);
+                Thread.Sleep(20);
+                MoveWindow(hwnd, newX, newY, width, height, true);
             }
         }
 
@@ -254,6 +267,7 @@ namespace Tomb_Raider_Resizer
             if (hwnd == IntPtr.Zero)
                 return;
 
+            // Für Fullscreen immer rahmenlos: WS_POPUP
             SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(unchecked((int)0x80000000))); // WS_POPUP
             int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) & ~0x00000008;
             exStyle |= WS_EX_APPWINDOW;
@@ -278,7 +292,8 @@ namespace Tomb_Raider_Resizer
         {
             InvalidateRect(hwnd, IntPtr.Zero, true);
             UpdateWindow(hwnd);
-            RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+            RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero,
+                RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
         }
 
         #region Display Settings API
