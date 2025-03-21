@@ -155,7 +155,7 @@ namespace Tomb_Raider_Resizer
         private void FillResolutionCombos()
         {
             int minWidth = 640;
-            int maxWidth = 8000;
+            int maxWidth = 5000;
 
             cmb169.Items.Clear();
             for (int width = minWidth; width <= maxWidth; width += 16)
