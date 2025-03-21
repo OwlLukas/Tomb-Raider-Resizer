@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace TombRaiderResizer
+namespace Tomb_Raider_Resizer
 {
-    /// <summary>
-    /// Main entry point for the application.
-    /// </summary>
     static class Program
     {
         [STAThread]

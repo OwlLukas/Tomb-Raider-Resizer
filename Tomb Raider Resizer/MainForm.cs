@@ -3,219 +3,129 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
-using System.Runtime.InteropServices;
 using Tomb_Raider_Resizer.Properties;
+using Tomb_Raider_Resizer;
 
-namespace TombRaiderResizer
+namespace Tomb_Raider_Resizer
 {
-    /// <summary>
-    /// Main form for the Tomb Raider Resizer application.
-    /// </summary>
     public partial class MainForm : Form
     {
         private List<GameInfo> games = new List<GameInfo>();
         private Timer processCheckTimer;
         private bool isProcessFound = false;
+        // Debounce counter for process check (only after several failures status switches)
+        private int notFoundCounter = 0;
+        private const int failureThreshold = 5;
 
         public MainForm()
         {
             InitializeComponent();
-            ApplySystemTheme(); // Passe das Thema beim Start an.
+            ApplySystemTheme();
 
-            // Set a fixed dialog style for a cleaner UI.
+            // Use fixed dialog style so user cannot resize the form manually.
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
 
-            // Auto-select "Forced Windowed Mode" at startup.
+            // Set default display mode and resolution mode.
             rbForceWindowed.Checked = true;
+            rbRes169.Checked = true;
 
             InitializeGameList();
             InitializeMonitorComboBox();
             InitializeDockPositionComboBox();
+            FillResolutionCombos();
+            AttachResolutionRadioEvents();
 
-            // Attach events to update control states when text changes.
+            // Custom resolution text boxes update control states on change.
             txtWidth.TextChanged += (s, e) => UpdateControlStates();
             txtHeight.TextChanged += (s, e) => UpdateControlStates();
 
-            // Attach event handler for display mode change (radio buttons).
             rbFullscreen.CheckedChanged += DisplayModeChanged;
             rbForceWindowed.CheckedChanged += DisplayModeChanged;
 
-            // Disable the resize button until valid inputs and process detection.
+            // Automatische Anpassung der Docking Position beim Ändern der Monitor Position:
+            cmbDockPosition.SelectedIndexChanged += cmbDockPosition_SelectedIndexChanged;
+
+            // Update resolution controls based on the selected resolution mode.
+            UpdateResolutionControls();
+
             btnResize.Enabled = false;
             UpdateControlStates();
 
-            // Start checking the process status for the initially selected game.
+            // Start process checking for the initially selected game.
             if (cmbGameList.SelectedItem is GameInfo initialGame)
             {
                 StartProcessCheck(initialGame);
             }
         }
 
-        /// <summary>
-        /// Prüft anhand der Registry, ob Windows im hellen Modus ist.
-        /// Gibt true zurück, wenn "AppsUseLightTheme" auf 1 steht (hell), ansonsten false (dunkel).
-        /// </summary>
-        private bool IsLightTheme()
-        {
-            object registryValue = Registry.GetValue(
-                @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
-                "AppsUseLightTheme", 1);
-            if (registryValue is int value)
-            {
-                return value == 1;
-            }
-            return true;
-        }
+        #region Update & Display Methods
 
-        /// <summary>
-        /// Passt die Farben des Formulars und seiner Controls entsprechend dem Systemthema an.
-        /// </summary>
-        private void ApplySystemTheme()
-        {
-            if (IsLightTheme())
-            {
-                // Heller Modus
-                this.BackColor = Color.White;
-                this.ForeColor = Color.Black;
-                // Weitere Anpassungen, z. B. Panel-Farben, können hier ergänzt werden.
-            }
-            else
-            {
-                // Dunkler Modus – typisches Windows-Dunkelgrau
-                this.BackColor = Color.FromArgb(45, 45, 48);
-                this.ForeColor = Color.White;
-            }
-        }
-
-        /// <summary>
-        /// Überschreibt WndProc, um auf WM_SETTINGCHANGE zu reagieren (Thema-Wechsel).
-        /// </summary>
-        /// <param name="m">Das Nachrichtenobjekt.</param>
-        protected override void WndProc(ref Message m)
-        {
-            const int WM_SETTINGCHANGE = 0x001A;
-            if (m.Msg == WM_SETTINGCHANGE)
-            {
-                string param = Marshal.PtrToStringUni(m.LParam);
-                if (!string.IsNullOrEmpty(param) &&
-                    (param.Contains("AppsUseLightTheme") || param.Contains("ImmersiveColorSet")))
-                {
-                    ApplySystemTheme();
-                }
-            }
-            base.WndProc(ref m);
-        }
-
-        /// <summary>
-        /// Sets the process status icon in the PictureBox using resources.
-        /// Skalierte das grüne Icon auf 24x24 Pixel.
-        /// </summary>
-        private void SetProcessStatusIcon(Image img)
-        {
-            if (img == Tomb_Raider_Resizer.Properties.Resources.greenCheckmark)
-            {
-                Bitmap resized = new Bitmap(img, new Size(24, 24));
-                pbProcess.Image = resized;
-            }
-            else
-            {
-                pbProcess.Image = img;
-            }
-        }
-
-        /// <summary>
-        /// Populates the game list.
-        /// </summary>
-        private void InitializeGameList()
-        {
-            games.Add(new GameInfo("Tomb Raider I-III Starring Lara Croft", "tomb123"));
-            games.Add(new GameInfo("Tomb Raider IV-VI Remastered", "tomb456"));
-            games.Add(new GameInfo("Tomb Raider The Angel of Darkness (2003)", "TRAOD", "TRAOD_P3", "TRAOD_P4"));
-
-            cmbGameList.DataSource = games;
-            cmbGameList.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbGameList.SelectedIndexChanged += cmbGameList_SelectedIndexChanged;
-        }
-
-        /// <summary>
-        /// Populates the monitor selection combo box.
-        /// </summary>
-        private void InitializeMonitorComboBox()
-        {
-            cmbMonitor.Items.Clear();
-            foreach (Screen screen in Screen.AllScreens)
-            {
-                cmbMonitor.Items.Add($"{screen.DeviceName} ({screen.Bounds.Width}x{screen.Bounds.Height})");
-            }
-            if (cmbMonitor.Items.Count > 0)
-            {
-                cmbMonitor.SelectedIndex = 0;
-            }
-            cmbMonitor.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbMonitor.SelectedIndexChanged += cmbMonitor_SelectedIndexChanged;
-        }
-
-        /// <summary>
-        /// Populates the docking position combo box.
-        /// </summary>
-        private void InitializeDockPositionComboBox()
-        {
-            cmbDockPosition.Items.Clear();
-            cmbDockPosition.Items.Add("Top Left");
-            cmbDockPosition.Items.Add("Top Right");
-            cmbDockPosition.Items.Add("Bottom Left");
-            cmbDockPosition.Items.Add("Bottom Right");
-            cmbDockPosition.Items.Add("Center");
-            cmbDockPosition.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbDockPosition.SelectedIndex = 4;
-            cmbDockPosition.SelectedIndexChanged += cmbDockPosition_SelectedIndexChanged;
-        }
-
-        /// <summary>
-        /// Updates the enabled/disabled states of controls based on input validity, process status, and display mode.
-        /// </summary>
         private void UpdateControlStates()
         {
+            // Wenn Fullscreen Mode aktiviert ist, alle Resolution-Controls deaktivieren.
             if (rbFullscreen.Checked)
             {
                 txtWidth.Enabled = false;
                 txtHeight.Enabled = false;
-                cmbDockPosition.SelectedIndex = 4;
+                cmb169.Enabled = false;
+                cmb43.Enabled = false;
+                rbResCustom.Enabled = false;
+                rbRes169.Enabled = false;
+                rbRes43.Enabled = false;
                 cmbDockPosition.Enabled = false;
                 chkRemoveFrame.Enabled = false;
                 btnResize.Enabled = isProcessFound;
             }
             else
             {
-                txtWidth.Enabled = isProcessFound;
-                txtHeight.Enabled = isProcessFound;
+                if (rbResCustom.Checked)
+                {
+                    txtWidth.Enabled = isProcessFound;
+                    txtHeight.Enabled = isProcessFound;
+                    cmb169.Enabled = false;
+                    cmb43.Enabled = false;
+                    bool validInputs = int.TryParse(txtWidth.Text.Trim(), out _) &&
+                                       int.TryParse(txtHeight.Text.Trim(), out _);
+                    btnResize.Enabled = validInputs && isProcessFound;
+                }
+                else if (rbRes169.Checked)
+                {
+                    txtWidth.Enabled = false;
+                    txtHeight.Enabled = false;
+                    cmb169.Enabled = isProcessFound;
+                    cmb43.Enabled = false;
+                    btnResize.Enabled = isProcessFound && cmb169.SelectedItem != null;
+                }
+                else if (rbRes43.Checked)
+                {
+                    txtWidth.Enabled = false;
+                    txtHeight.Enabled = false;
+                    cmb169.Enabled = false;
+                    cmb43.Enabled = isProcessFound;
+                    btnResize.Enabled = isProcessFound && cmb43.SelectedItem != null;
+                }
+                rbResCustom.Enabled = isProcessFound;
+                rbRes169.Enabled = isProcessFound;
+                rbRes43.Enabled = isProcessFound;
                 cmbDockPosition.Enabled = isProcessFound;
                 chkRemoveFrame.Enabled = isProcessFound;
-                bool validInputs = int.TryParse(txtWidth.Text, out _) && int.TryParse(txtHeight.Text, out _);
-                btnResize.Enabled = validInputs && isProcessFound;
             }
-
             cmbMonitor.Enabled = isProcessFound;
             rbForceWindowed.Enabled = isProcessFound;
             rbFullscreen.Enabled = isProcessFound;
+
             lblMonitor.Enabled = isProcessFound;
             lblDocking.Enabled = isProcessFound;
-            lblResolution.Enabled = isProcessFound;
-            lblWindowOptions.Enabled = isProcessFound;
             lblNote.Enabled = isProcessFound;
             lblWidth.Enabled = isProcessFound;
             lblHeight.Enabled = isProcessFound;
-            lblWindowExtras.Enabled = isProcessFound;
         }
 
-        /// <summary>
-        /// Called when the display mode radio buttons change.
-        /// In Fullscreen mode, clears and disables the width/height fields, sets docking to Center, and disables the "Remove Window Frame" checkbox.
-        /// </summary>
         private void DisplayModeChanged(object sender, EventArgs e)
         {
             if (rbFullscreen.Checked)
@@ -238,9 +148,144 @@ namespace TombRaiderResizer
             UpdateControlStates();
         }
 
-        /// <summary>
-        /// Starts a timer to periodically check if the process for the selected game is running.
-        /// </summary>
+        #endregion
+
+        #region Resolution Combo Handling
+
+        private void FillResolutionCombos()
+        {
+            int minWidth = 640;
+            int maxWidth = 8000;
+
+            cmb169.Items.Clear();
+            for (int width = minWidth; width <= maxWidth; width += 16)
+            {
+                if ((width * 9) % 16 == 0)
+                {
+                    int height = width * 9 / 16;
+                    cmb169.Items.Add($"{width} x {height}");
+                }
+            }
+            // Default select "1280 x 720" if available.
+            int index1280 = -1;
+            for (int i = 0; i < cmb169.Items.Count; i++)
+            {
+                if (cmb169.Items[i].ToString() == "1280 x 720")
+                {
+                    index1280 = i;
+                    break;
+                }
+            }
+            if (index1280 >= 0)
+                cmb169.SelectedIndex = index1280;
+            else if (cmb169.Items.Count > 0)
+                cmb169.SelectedIndex = 0;
+
+            cmb43.Items.Clear();
+            for (int width = minWidth; width <= maxWidth; width += 4)
+            {
+                if ((width * 3) % 4 == 0)
+                {
+                    int height = width * 3 / 4;
+                    cmb43.Items.Add($"{width} x {height}");
+                }
+            }
+            if (cmb43.Items.Count > 0)
+                cmb43.SelectedIndex = 0;
+        }
+
+        private void AttachResolutionRadioEvents()
+        {
+            rbResCustom.CheckedChanged += (s, e) => UpdateResolutionControls();
+            rbRes169.CheckedChanged += (s, e) => UpdateResolutionControls();
+            rbRes43.CheckedChanged += (s, e) => UpdateResolutionControls();
+        }
+
+        private void UpdateResolutionControls()
+        {
+            if (rbResCustom.Checked)
+            {
+                txtWidth.Enabled = true;
+                txtHeight.Enabled = true;
+                cmb169.Enabled = false;
+                cmb43.Enabled = false;
+            }
+            else if (rbRes169.Checked)
+            {
+                txtWidth.Enabled = false;
+                txtHeight.Enabled = false;
+                cmb169.Enabled = isProcessFound;
+                cmb43.Enabled = false;
+            }
+            else if (rbRes43.Checked)
+            {
+                txtWidth.Enabled = false;
+                txtHeight.Enabled = false;
+                cmb169.Enabled = false;
+                cmb43.Enabled = isProcessFound;
+            }
+            UpdateControlStates();
+        }
+
+        #endregion
+
+        #region Theme & Process Check
+
+        private bool IsLightTheme()
+        {
+            object registryValue = Registry.GetValue(
+                @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+                "AppsUseLightTheme", 1);
+            return (registryValue is int value) ? (value == 1) : true;
+        }
+
+        private void ApplySystemTheme()
+        {
+            if (IsLightTheme())
+            {
+                this.BackColor = Color.White;
+                this.ForeColor = Color.Black;
+                btnResize.BackColor = SystemColors.Control;
+                btnResize.ForeColor = SystemColors.ControlText;
+            }
+            else
+            {
+                this.BackColor = Color.FromArgb(45, 45, 48);
+                this.ForeColor = Color.White;
+                // Für Dark Mode: ein sehr dunkler Hintergrund (Schwarz) und weiße Schrift für den Resize-Button
+                btnResize.BackColor = Color.Black;
+                btnResize.ForeColor = Color.White;
+            }
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_SETTINGCHANGE = 0x001A;
+            if (m.Msg == WM_SETTINGCHANGE)
+            {
+                string param = Marshal.PtrToStringUni(m.LParam);
+                if (!string.IsNullOrEmpty(param) &&
+                    (param.Contains("AppsUseLightTheme") || param.Contains("ImmersiveColorSet")))
+                {
+                    ApplySystemTheme();
+                }
+            }
+            base.WndProc(ref m);
+        }
+
+        private void SetProcessStatusIcon(System.Drawing.Image img)
+        {
+            if (img == Tomb_Raider_Resizer.Properties.Resources.greenCheckmark)
+            {
+                Bitmap resized = new Bitmap(img, new Size(24, 24));
+                pbProcess.Image = resized;
+            }
+            else
+            {
+                pbProcess.Image = img;
+            }
+        }
+
         private void StartProcessCheck(GameInfo game)
         {
             processCheckTimer?.Stop();
@@ -251,17 +296,10 @@ namespace TombRaiderResizer
             processCheckTimer.Start();
         }
 
-        /// <summary>
-        /// Timer tick event that checks for the process and updates the status icon.
-        /// Zeigt solange "Searching..." an, bis der Prozess gefunden wird.
-        /// </summary>
         private void ProcessCheckTimer_Tick(object sender, EventArgs e)
         {
             if (!(cmbGameList.SelectedItem is GameInfo game))
                 return;
-
-            // Zeige während der Suche das Lade-GIF.
-            SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
 
             Task.Run(() =>
             {
@@ -270,36 +308,88 @@ namespace TombRaiderResizer
                 {
                     if (processFound)
                     {
-                        isProcessFound = true;
-                        lblProcessStatus.Text = "Process Found!";
-                        SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.greenCheckmark);
+                        notFoundCounter = 0;
+                        if (!isProcessFound)
+                        {
+                            isProcessFound = true;
+                            lblProcessStatus.Text = "Process Found!";
+                            SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.greenCheckmark);
+                            // When process is found, default to 16:9 resolution.
+                            rbRes169.Checked = true;
+                        }
                     }
                     else
                     {
-                        isProcessFound = false;
-                        lblProcessStatus.Text = "Searching...";
-                        SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
+                        notFoundCounter++;
+                        if (notFoundCounter >= failureThreshold && isProcessFound)
+                        {
+                            isProcessFound = false;
+                            lblProcessStatus.Text = "Searching...";
+                            SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
+                        }
                     }
                     UpdateControlStates();
                 }));
             });
         }
 
-        /// <summary>
-        /// Handles the game selection change event.
-        /// </summary>
+        #endregion
+
+        #region Initialization of Lists and Controls
+
+        private void InitializeGameList()
+        {
+            games.Add(new GameInfo("Tomb Raider I-III Starring Lara Croft", "tomb123"));
+            games.Add(new GameInfo("Tomb Raider IV-VI Remastered", "tomb456"));
+            games.Add(new GameInfo("Tomb Raider The Angel of Darkness (2003)", "TRAOD", "TRAOD_P3", "TRAOD_P4"));
+
+            cmbGameList.DataSource = games;
+            cmbGameList.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbGameList.SelectedIndexChanged += cmbGameList_SelectedIndexChanged;
+        }
+
+        private void InitializeMonitorComboBox()
+        {
+            cmbMonitor.Items.Clear();
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                cmbMonitor.Items.Add($"{screen.DeviceName} ({screen.Bounds.Width}x{screen.Bounds.Height})");
+            }
+            if (cmbMonitor.Items.Count > 0)
+                cmbMonitor.SelectedIndex = 0;
+            cmbMonitor.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbMonitor.SelectedIndexChanged += cmbMonitor_SelectedIndexChanged;
+        }
+
+        private void InitializeDockPositionComboBox()
+        {
+            cmbDockPosition.Items.Clear();
+            cmbDockPosition.Items.Add("Top Left");
+            cmbDockPosition.Items.Add("Top Right");
+            cmbDockPosition.Items.Add("Bottom Left");
+            cmbDockPosition.Items.Add("Bottom Right");
+            cmbDockPosition.Items.Add("Center");
+            cmbDockPosition.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbDockPosition.SelectedIndex = 4;
+            cmbDockPosition.SelectedIndexChanged += cmbDockPosition_SelectedIndexChanged;
+        }
+
+        #endregion
+
+        #region Event Handlers
+
         private void cmbGameList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cmbGameList.SelectedItem is GameInfo selectedGame)
             {
+                notFoundCounter = 0;
+                isProcessFound = false;
+                lblProcessStatus.Text = "Searching...";
+                SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
                 StartProcessCheck(selectedGame);
             }
         }
 
-        /// <summary>
-        /// Handles the monitor selection change event.
-        /// If fullscreen is active, adjusts the window to the new monitor bounds; otherwise, moves the window.
-        /// </summary>
         private void cmbMonitor_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (rbFullscreen.Checked)
@@ -318,57 +408,50 @@ namespace TombRaiderResizer
             }
             else
             {
+                // Beim Monitorwechsel soll auch die aktuelle Docking Position berücksichtigt werden:
                 MoveGameWindowToSelectedMonitor();
             }
         }
 
-        /// <summary>
-        /// Moves the game window to the monitor selected in cmbMonitor.
-        /// </summary>
         private void MoveGameWindowToSelectedMonitor()
         {
             int monitorIndex = cmbMonitor.SelectedIndex;
             if (monitorIndex < 0 || monitorIndex >= Screen.AllScreens.Length)
                 return;
-
             Screen selectedScreen = Screen.AllScreens[monitorIndex];
             Rectangle workingArea = selectedScreen.WorkingArea;
-
             if (cmbGameList.SelectedItem is GameInfo selectedGame)
             {
                 string processName = selectedGame.ProcessNames.FirstOrDefault();
                 if (!string.IsNullOrEmpty(processName))
                 {
-                    ResizeHelper.MoveWindowToMonitor(processName, workingArea);
+                    var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
+                    // Fenster neu positionieren gemäß Docking Position:
+                    ResizeHelper.DockWindowToMonitor(processName, workingArea, dockPos);
                 }
             }
         }
 
-        /// <summary>
-        /// Handles the docking position selection change event.
-        /// </summary>
         private void cmbDockPosition_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // Automatische Anpassung der Docking Position:
+            if (!isProcessFound) return;
+            if (rbFullscreen.Checked) return;
+            if (!(cmbGameList.SelectedItem is GameInfo selectedGame)) return;
             int monitorIndex = cmbMonitor.SelectedIndex;
             if (monitorIndex < 0 || monitorIndex >= Screen.AllScreens.Length)
                 return;
-
             Rectangle workingArea = Screen.AllScreens[monitorIndex].WorkingArea;
-            if (cmbGameList.SelectedItem is GameInfo selectedGame)
-            {
-                string processName = selectedGame.ProcessNames.FirstOrDefault();
-                if (!string.IsNullOrEmpty(processName))
-                {
-                    ResizeHelper.DockWindowToMonitor(processName, workingArea, (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex);
-                }
-            }
+            var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
+            // Fenster an die neue Docking Position verschieben
+            ResizeHelper.DockWindowToMonitor(selectedGame.ProcessNames.FirstOrDefault(), workingArea, dockPos);
         }
 
-        /// <summary>
-        /// Handles the click event for the resize button.
-        /// In Fullscreen mode, executes the same action as Alt+Enter (Borderless Fullscreen).
-        /// In non-fullscreen mode, performs the standard resize with docking.
-        /// </summary>
+        // For predefined resolution ComboBoxes the Resize button is disabled (auto-resize)
+        private void cmb169_SelectedIndexChanged(object sender, EventArgs e) { }
+        private void cmb43_SelectedIndexChanged(object sender, EventArgs e) { }
+
+        // ...
         private void btnResize_Click(object sender, EventArgs e)
         {
             if (!(cmbGameList.SelectedItem is GameInfo selectedGame))
@@ -380,22 +463,78 @@ namespace TombRaiderResizer
 
             Rectangle workingArea = Screen.AllScreens[monitorIndex].WorkingArea;
             bool removeFrame = chkRemoveFrame.Checked;
+            int width = 0, height = 0;
 
+            // Zuerst: Wenn Fullscreen ausgewählt ist, führe den Fullscreen-Zweig aus.
             if (rbFullscreen.Checked)
             {
                 Rectangle bounds = Screen.AllScreens[monitorIndex].Bounds;
-                ResizeHelper.BorderlessFullscreenWindow(selectedGame.ProcessNames.FirstOrDefault(), removeFrame, false, bounds);
+                ResizeHelper.BorderlessFullscreenWindow(
+                    selectedGame.ProcessNames.FirstOrDefault(),
+                    removeFrame,
+                    false,
+                    bounds);
             }
-            else
+            else if (rbResCustom.Checked)
             {
-                if (!int.TryParse(txtWidth.Text, out int width) ||
-                    !int.TryParse(txtHeight.Text, out int height))
+                if (!int.TryParse(txtWidth.Text.Trim(), out width) ||
+                    !int.TryParse(txtHeight.Text.Trim(), out height))
                     return;
-
+                ResizeHelper.ResizeWindow(
+                    selectedGame.ProcessNames.FirstOrDefault(),
+                    width,
+                    height,
+                    removeFrame,
+                    rbForceWindowed.Checked,
+                    workingArea,
+                    (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex,
+                    true);
+            }
+            else if (rbRes169.Checked)
+            {
+                string res = cmb169.SelectedItem.ToString();
+                var parts = res.Split('x');
+                if (parts.Length == 2)
+                {
+                    if (!int.TryParse(parts[0].Trim(), out width) ||
+                        !int.TryParse(parts[1].Trim(), out height))
+                        return;
+                }
                 bool forceWindowed = rbForceWindowed.Checked;
                 var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
-                ResizeHelper.ResizeWindow(selectedGame.ProcessNames.FirstOrDefault(), width, height, removeFrame, forceWindowed, workingArea, dockPos);
+                ResizeHelper.ResizeWindow(
+                    selectedGame.ProcessNames.FirstOrDefault(),
+                    width,
+                    height,
+                    removeFrame,
+                    forceWindowed,
+                    workingArea,
+                    dockPos);
+            }
+            else if (rbRes43.Checked)
+            {
+                string res = cmb43.SelectedItem.ToString();
+                var parts = res.Split('x');
+                if (parts.Length == 2)
+                {
+                    if (!int.TryParse(parts[0].Trim(), out width) ||
+                        !int.TryParse(parts[1].Trim(), out height))
+                        return;
+                }
+                bool forceWindowed = rbForceWindowed.Checked;
+                var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
+                ResizeHelper.ResizeWindow(
+                    selectedGame.ProcessNames.FirstOrDefault(),
+                    width,
+                    height,
+                    removeFrame,
+                    forceWindowed,
+                    workingArea,
+                    dockPos);
             }
         }
+
+
+        #endregion
     }
 }
