@@ -142,24 +142,24 @@
             // 
             // txtWidth
             // 
-            this.txtWidth.Location = new System.Drawing.Point(119, 77);
+            this.txtWidth.Location = new System.Drawing.Point(103, 77);
             this.txtWidth.Name = "txtWidth";
-            this.txtWidth.Size = new System.Drawing.Size(68, 20);
+            this.txtWidth.Size = new System.Drawing.Size(54, 20);
             this.txtWidth.TabIndex = 4;
             this.toolTip1.SetToolTip(this.txtWidth, "Width in pixels.");
             // 
             // txtHeight
             // 
-            this.txtHeight.Location = new System.Drawing.Point(218, 79);
+            this.txtHeight.Location = new System.Drawing.Point(187, 78);
             this.txtHeight.Name = "txtHeight";
-            this.txtHeight.Size = new System.Drawing.Size(68, 20);
+            this.txtHeight.Size = new System.Drawing.Size(54, 20);
             this.txtHeight.TabIndex = 5;
             this.toolTip1.SetToolTip(this.txtHeight, "Height in pixels.");
             // 
             // lblWidth
             // 
             this.lblWidth.AutoSize = true;
-            this.lblWidth.Location = new System.Drawing.Point(92, 82);
+            this.lblWidth.Location = new System.Drawing.Point(72, 81);
             this.lblWidth.Name = "lblWidth";
             this.lblWidth.Size = new System.Drawing.Size(21, 13);
             this.lblWidth.TabIndex = 6;
@@ -169,7 +169,7 @@
             // lblHeight
             // 
             this.lblHeight.AutoSize = true;
-            this.lblHeight.Location = new System.Drawing.Point(193, 82);
+            this.lblHeight.Location = new System.Drawing.Point(163, 81);
             this.lblHeight.Name = "lblHeight";
             this.lblHeight.Size = new System.Drawing.Size(18, 13);
             this.lblHeight.TabIndex = 7;
@@ -179,7 +179,7 @@
             // rbResCustom
             // 
             this.rbResCustom.AutoSize = true;
-            this.rbResCustom.Location = new System.Drawing.Point(6, 82);
+            this.rbResCustom.Location = new System.Drawing.Point(4, 81);
             this.rbResCustom.Name = "rbResCustom";
             this.rbResCustom.Size = new System.Drawing.Size(60, 17);
             this.rbResCustom.TabIndex = 30;
@@ -203,7 +203,7 @@
             // rbRes43
             // 
             this.rbRes43.AutoSize = true;
-            this.rbRes43.Location = new System.Drawing.Point(6, 28);
+            this.rbRes43.Location = new System.Drawing.Point(4, 28);
             this.rbRes43.Name = "rbRes43";
             this.rbRes43.Size = new System.Drawing.Size(40, 17);
             this.rbRes43.TabIndex = 32;
@@ -245,7 +245,7 @@
             // rbFullscreen
             // 
             this.rbFullscreen.AutoSize = true;
-            this.rbFullscreen.Location = new System.Drawing.Point(116, 26);
+            this.rbFullscreen.Location = new System.Drawing.Point(163, 25);
             this.rbFullscreen.Name = "rbFullscreen";
             this.rbFullscreen.Size = new System.Drawing.Size(103, 17);
             this.rbFullscreen.TabIndex = 1;
