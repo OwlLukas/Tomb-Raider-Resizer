@@ -97,7 +97,7 @@
             this.lblGameSelect.AutoSize = true;
             this.lblGameSelect.Location = new System.Drawing.Point(6, 26);
             this.lblGameSelect.Name = "lblGameSelect";
-            this.lblGameSelect.Size = new System.Drawing.Size(77, 13);
+            this.lblGameSelect.Size = new System.Drawing.Size(89, 15);
             this.lblGameSelect.TabIndex = 1;
             this.lblGameSelect.Text = "Choose Game:";
             this.toolTip1.SetToolTip(this.lblGameSelect, "Select a game.");
@@ -116,7 +116,7 @@
             this.lblProcessStatusLabel.AutoSize = true;
             this.lblProcessStatusLabel.Location = new System.Drawing.Point(6, 52);
             this.lblProcessStatusLabel.Name = "lblProcessStatusLabel";
-            this.lblProcessStatusLabel.Size = new System.Drawing.Size(81, 13);
+            this.lblProcessStatusLabel.Size = new System.Drawing.Size(91, 15);
             this.lblProcessStatusLabel.TabIndex = 17;
             this.lblProcessStatusLabel.Text = "Process Status:";
             this.toolTip1.SetToolTip(this.lblProcessStatusLabel, "Process status.");
@@ -126,7 +126,7 @@
             this.lblProcessStatus.AutoSize = true;
             this.lblProcessStatus.Location = new System.Drawing.Point(105, 52);
             this.lblProcessStatus.Name = "lblProcessStatus";
-            this.lblProcessStatus.Size = new System.Drawing.Size(117, 13);
+            this.lblProcessStatus.Size = new System.Drawing.Size(132, 15);
             this.lblProcessStatus.TabIndex = 18;
             this.lblProcessStatus.Text = "Scanning for Process...";
             this.toolTip1.SetToolTip(this.lblProcessStatus, "Current process status.");
@@ -142,7 +142,7 @@
             // 
             // txtWidth
             // 
-            this.txtWidth.Location = new System.Drawing.Point(103, 77);
+            this.txtWidth.Location = new System.Drawing.Point(105, 76);
             this.txtWidth.Name = "txtWidth";
             this.txtWidth.Size = new System.Drawing.Size(54, 20);
             this.txtWidth.TabIndex = 4;
@@ -150,7 +150,7 @@
             // 
             // txtHeight
             // 
-            this.txtHeight.Location = new System.Drawing.Point(187, 78);
+            this.txtHeight.Location = new System.Drawing.Point(189, 77);
             this.txtHeight.Name = "txtHeight";
             this.txtHeight.Size = new System.Drawing.Size(54, 20);
             this.txtHeight.TabIndex = 5;
@@ -159,9 +159,9 @@
             // lblWidth
             // 
             this.lblWidth.AutoSize = true;
-            this.lblWidth.Location = new System.Drawing.Point(72, 81);
+            this.lblWidth.Location = new System.Drawing.Point(74, 80);
             this.lblWidth.Name = "lblWidth";
-            this.lblWidth.Size = new System.Drawing.Size(21, 13);
+            this.lblWidth.Size = new System.Drawing.Size(21, 15);
             this.lblWidth.TabIndex = 6;
             this.lblWidth.Text = "W:";
             this.toolTip1.SetToolTip(this.lblWidth, "Width (px).");
@@ -169,9 +169,9 @@
             // lblHeight
             // 
             this.lblHeight.AutoSize = true;
-            this.lblHeight.Location = new System.Drawing.Point(163, 81);
+            this.lblHeight.Location = new System.Drawing.Point(165, 80);
             this.lblHeight.Name = "lblHeight";
-            this.lblHeight.Size = new System.Drawing.Size(18, 13);
+            this.lblHeight.Size = new System.Drawing.Size(19, 15);
             this.lblHeight.TabIndex = 7;
             this.lblHeight.Text = "H:";
             this.toolTip1.SetToolTip(this.lblHeight, "Height (px).");
@@ -179,9 +179,9 @@
             // rbResCustom
             // 
             this.rbResCustom.AutoSize = true;
-            this.rbResCustom.Location = new System.Drawing.Point(4, 81);
+            this.rbResCustom.Location = new System.Drawing.Point(4, 77);
             this.rbResCustom.Name = "rbResCustom";
-            this.rbResCustom.Size = new System.Drawing.Size(60, 17);
+            this.rbResCustom.Size = new System.Drawing.Size(70, 19);
             this.rbResCustom.TabIndex = 30;
             this.rbResCustom.TabStop = true;
             this.rbResCustom.Text = "Custom";
@@ -193,7 +193,7 @@
             this.rbRes169.AutoSize = true;
             this.rbRes169.Location = new System.Drawing.Point(4, 55);
             this.rbRes169.Name = "rbRes169";
-            this.rbRes169.Size = new System.Drawing.Size(46, 17);
+            this.rbRes169.Size = new System.Drawing.Size(52, 19);
             this.rbRes169.TabIndex = 31;
             this.rbRes169.TabStop = true;
             this.rbRes169.Text = "16:9";
@@ -205,7 +205,7 @@
             this.rbRes43.AutoSize = true;
             this.rbRes43.Location = new System.Drawing.Point(4, 28);
             this.rbRes43.Name = "rbRes43";
-            this.rbRes43.Size = new System.Drawing.Size(40, 17);
+            this.rbRes43.Size = new System.Drawing.Size(45, 19);
             this.rbRes43.TabIndex = 32;
             this.rbRes43.TabStop = true;
             this.rbRes43.Text = "4:3";
@@ -235,7 +235,7 @@
             this.rbForceWindowed.AutoSize = true;
             this.rbForceWindowed.Location = new System.Drawing.Point(6, 25);
             this.rbForceWindowed.Name = "rbForceWindowed";
-            this.rbForceWindowed.Size = new System.Drawing.Size(94, 17);
+            this.rbForceWindowed.Size = new System.Drawing.Size(107, 19);
             this.rbForceWindowed.TabIndex = 0;
             this.rbForceWindowed.TabStop = true;
             this.rbForceWindowed.Text = "Window Mode";
@@ -247,7 +247,7 @@
             this.rbFullscreen.AutoSize = true;
             this.rbFullscreen.Location = new System.Drawing.Point(163, 25);
             this.rbFullscreen.Name = "rbFullscreen";
-            this.rbFullscreen.Size = new System.Drawing.Size(103, 17);
+            this.rbFullscreen.Size = new System.Drawing.Size(120, 19);
             this.rbFullscreen.TabIndex = 1;
             this.rbFullscreen.TabStop = true;
             this.rbFullscreen.Text = "Fullscreen Mode";
@@ -259,7 +259,7 @@
             this.chkRemoveFrame.AutoSize = true;
             this.chkRemoveFrame.Location = new System.Drawing.Point(6, 49);
             this.chkRemoveFrame.Name = "chkRemoveFrame";
-            this.chkRemoveFrame.Size = new System.Drawing.Size(140, 17);
+            this.chkRemoveFrame.Size = new System.Drawing.Size(161, 19);
             this.chkRemoveFrame.TabIndex = 16;
             this.chkRemoveFrame.Text = "Remove Window Frame";
             this.toolTip1.SetToolTip(this.chkRemoveFrame, "Remove window border.");
@@ -270,7 +270,7 @@
             this.lblDocking.AutoSize = true;
             this.lblDocking.Location = new System.Drawing.Point(3, 48);
             this.lblDocking.Name = "lblDocking";
-            this.lblDocking.Size = new System.Drawing.Size(90, 13);
+            this.lblDocking.Size = new System.Drawing.Size(102, 15);
             this.lblDocking.TabIndex = 25;
             this.lblDocking.Text = "Docking Position:";
             this.toolTip1.SetToolTip(this.lblDocking, "Select docking position.");
@@ -289,7 +289,7 @@
             this.lblNote.AutoSize = true;
             this.lblNote.Location = new System.Drawing.Point(3, 81);
             this.lblNote.Name = "lblNote";
-            this.lblNote.Size = new System.Drawing.Size(389, 13);
+            this.lblNote.Size = new System.Drawing.Size(446, 15);
             this.lblNote.TabIndex = 24;
             this.lblNote.Text = "Note: You can still use ALT+Enter to manually toggle full screen or window mode.";
             this.toolTip1.SetToolTip(this.lblNote, "Tip: Use ALT+Enter to toggle full screen.");
@@ -299,7 +299,7 @@
             this.lblMonitor.AutoSize = true;
             this.lblMonitor.Location = new System.Drawing.Point(3, 24);
             this.lblMonitor.Name = "lblMonitor";
-            this.lblMonitor.Size = new System.Drawing.Size(45, 13);
+            this.lblMonitor.Size = new System.Drawing.Size(52, 15);
             this.lblMonitor.TabIndex = 22;
             this.lblMonitor.Text = "Monitor:";
             this.toolTip1.SetToolTip(this.lblMonitor, "Select monitor.");
@@ -330,7 +330,7 @@
             this.lblGameSelectionHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.lblGameSelectionHeader.Location = new System.Drawing.Point(3, 0);
             this.lblGameSelectionHeader.Name = "lblGameSelectionHeader";
-            this.lblGameSelectionHeader.Size = new System.Drawing.Size(95, 13);
+            this.lblGameSelectionHeader.Size = new System.Drawing.Size(121, 17);
             this.lblGameSelectionHeader.TabIndex = 0;
             this.lblGameSelectionHeader.Text = "Process Details";
             // 
@@ -340,7 +340,7 @@
             this.lblMonitorOptionsHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.lblMonitorOptionsHeader.Location = new System.Drawing.Point(3, 0);
             this.lblMonitorOptionsHeader.Name = "lblMonitorOptionsHeader";
-            this.lblMonitorOptionsHeader.Size = new System.Drawing.Size(92, 13);
+            this.lblMonitorOptionsHeader.Size = new System.Drawing.Size(117, 17);
             this.lblMonitorOptionsHeader.TabIndex = 0;
             this.lblMonitorOptionsHeader.Text = "Monitor Details";
             // 
@@ -350,7 +350,7 @@
             this.lblResolutionOptionsHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.lblResolutionOptionsHeader.Location = new System.Drawing.Point(3, 2);
             this.lblResolutionOptionsHeader.Name = "lblResolutionOptionsHeader";
-            this.lblResolutionOptionsHeader.Size = new System.Drawing.Size(110, 13);
+            this.lblResolutionOptionsHeader.Size = new System.Drawing.Size(140, 17);
             this.lblResolutionOptionsHeader.TabIndex = 0;
             this.lblResolutionOptionsHeader.Text = "Resolution Details";
             // 
@@ -360,7 +360,7 @@
             this.lblWindowOptionsHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.lblWindowOptionsHeader.Location = new System.Drawing.Point(3, 0);
             this.lblWindowOptionsHeader.Name = "lblWindowOptionsHeader";
-            this.lblWindowOptionsHeader.Size = new System.Drawing.Size(95, 13);
+            this.lblWindowOptionsHeader.Size = new System.Drawing.Size(118, 17);
             this.lblWindowOptionsHeader.TabIndex = 0;
             this.lblWindowOptionsHeader.Text = "Window Details";
             // 

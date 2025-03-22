@@ -265,9 +265,10 @@ namespace Tomb_Raider_Resizer
             {
                 this.BackColor = Color.FromArgb(45, 45, 48);
                 this.ForeColor = Color.White;
-                // Für Dark Mode: ein sehr dunkler Hintergrund (Schwarz) und weiße Schrift für den Resize-Button
-                btnResize.BackColor = Color.Black;
+                // Für Dark Mode: ein dunkles Grau, das besser zu den anderen Elementen passt
+                btnResize.BackColor = Color.FromArgb(63, 63, 70);
                 btnResize.ForeColor = Color.White;
+
             }
         }
 
