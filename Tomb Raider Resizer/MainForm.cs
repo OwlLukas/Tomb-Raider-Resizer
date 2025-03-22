@@ -398,7 +398,7 @@ namespace Tomb_Raider_Resizer
                 Rectangle bounds = Screen.AllScreens[monitorIndex].Bounds;
                 if (cmbGameList.SelectedItem is GameInfo selectedGame)
                 {
-                    string processName = selectedGame.ProcessNames.FirstOrDefault();
+                    string processName = GetActiveProcessName(selectedGame);
                     if (!string.IsNullOrEmpty(processName))
                     {
                         bool removeFrame = chkRemoveFrame.Checked;
@@ -422,7 +422,7 @@ namespace Tomb_Raider_Resizer
             Rectangle workingArea = selectedScreen.WorkingArea;
             if (cmbGameList.SelectedItem is GameInfo selectedGame)
             {
-                string processName = selectedGame.ProcessNames.FirstOrDefault();
+                string processName = GetActiveProcessName(selectedGame);
                 if (!string.IsNullOrEmpty(processName))
                 {
                     var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
@@ -444,7 +444,7 @@ namespace Tomb_Raider_Resizer
             Rectangle workingArea = Screen.AllScreens[monitorIndex].WorkingArea;
             var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
             // Fenster an die neue Docking Position verschieben
-            ResizeHelper.DockWindowToMonitor(selectedGame.ProcessNames.FirstOrDefault(), workingArea, dockPos);
+            ResizeHelper.DockWindowToMonitor(GetActiveProcessName(selectedGame), workingArea, dockPos);
         }
 
         // For predefined resolution ComboBoxes the Resize button is disabled (auto-resize)
@@ -470,7 +470,7 @@ namespace Tomb_Raider_Resizer
             {
                 Rectangle bounds = Screen.AllScreens[monitorIndex].Bounds;
                 ResizeHelper.BorderlessFullscreenWindow(
-                    selectedGame.ProcessNames.FirstOrDefault(),
+                    GetActiveProcessName(selectedGame),
                     removeFrame,
                     false,
                     bounds);
@@ -481,7 +481,7 @@ namespace Tomb_Raider_Resizer
                     !int.TryParse(txtHeight.Text.Trim(), out height))
                     return;
                 ResizeHelper.ResizeWindow(
-                    selectedGame.ProcessNames.FirstOrDefault(),
+                    GetActiveProcessName(selectedGame),
                     width,
                     height,
                     removeFrame,
@@ -503,7 +503,7 @@ namespace Tomb_Raider_Resizer
                 bool forceWindowed = rbForceWindowed.Checked;
                 var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
                 ResizeHelper.ResizeWindow(
-                    selectedGame.ProcessNames.FirstOrDefault(),
+                    GetActiveProcessName(selectedGame),
                     width,
                     height,
                     removeFrame,
@@ -524,7 +524,7 @@ namespace Tomb_Raider_Resizer
                 bool forceWindowed = rbForceWindowed.Checked;
                 var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
                 ResizeHelper.ResizeWindow(
-                    selectedGame.ProcessNames.FirstOrDefault(),
+                    GetActiveProcessName(selectedGame),
                     width,
                     height,
                     removeFrame,
@@ -534,6 +534,23 @@ namespace Tomb_Raider_Resizer
             }
         }
 
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Durchläuft die in GameInfo.ProcessNames gespeicherten Prozessnamen und gibt den ersten zurück,
+        /// bei dem ein laufender Prozess gefunden wird. Andernfalls wird null zurückgegeben.
+        /// </summary>
+        private string GetActiveProcessName(GameInfo game)
+        {
+            foreach (var procName in game.ProcessNames)
+            {
+                if (Process.GetProcessesByName(procName).Length > 0)
+                    return procName;
+            }
+            return null;
+        }
 
         #endregion
     }
