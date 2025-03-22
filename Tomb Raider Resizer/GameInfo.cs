@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Tomb_Raider_Resizer
+namespace TombRaiderResizer
 {
     /// <summary>
     /// Represents a game and its associated process names.

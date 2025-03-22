@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using Tomb_Raider_Resizer.Properties;
 using Tomb_Raider_Resizer;
+using TombRaiderResizer;
 
 namespace Tomb_Raider_Resizer
 {
@@ -70,16 +71,13 @@ namespace Tomb_Raider_Resizer
             // Wenn Fullscreen Mode aktiviert ist, alle Resolution-Controls deaktivieren.
             if (rbFullscreen.Checked)
             {
+                txtWidth.Text = "";
+                txtHeight.Text = "";
                 txtWidth.Enabled = false;
                 txtHeight.Enabled = false;
-                cmb169.Enabled = false;
-                cmb43.Enabled = false;
-                rbResCustom.Enabled = false;
-                rbRes169.Enabled = false;
-                rbRes43.Enabled = false;
+                cmbDockPosition.SelectedIndex = 4;
                 cmbDockPosition.Enabled = false;
                 chkRemoveFrame.Enabled = false;
-                btnResize.Enabled = isProcessFound;
             }
             else
             {
@@ -124,6 +122,21 @@ namespace Tomb_Raider_Resizer
             lblNote.Enabled = isProcessFound;
             lblWidth.Enabled = isProcessFound;
             lblHeight.Enabled = isProcessFound;
+
+            // Spezifische Anpassungen für "Tomb Raider The Angel of Darkness"
+            if (cmbGameList.SelectedItem is GameInfo selectedGame &&
+                selectedGame.Title.Contains("Angel of Darkness"))
+            {
+                // Deaktiviere Fullscreen Radiobox und Monitor Combobox
+                rbFullscreen.Enabled = false;
+                cmbMonitor.Enabled = false;
+
+                // Falls versehentlich Fullscreen ausgewählt wurde, schalte auf Window Mode um.
+                if (rbFullscreen.Checked)
+                {
+                    rbForceWindowed.Checked = true;
+                }
+            }
         }
 
         private void DisplayModeChanged(object sender, EventArgs e)
@@ -387,6 +400,13 @@ namespace Tomb_Raider_Resizer
                 lblProcessStatus.Text = "Searching...";
                 SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
                 StartProcessCheck(selectedGame);
+
+                // Bei "Angel of Darkness" sofort Window Mode erzwingen.
+                if (selectedGame.Title.Contains("Angel of Darkness"))
+                {
+                    rbForceWindowed.Checked = true;
+                }
+                UpdateControlStates();
             }
         }
 
