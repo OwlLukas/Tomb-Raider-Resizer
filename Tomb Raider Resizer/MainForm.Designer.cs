@@ -97,7 +97,8 @@
             this.lblGameSelect.Location = new System.Drawing.Point(6, 26);
             this.lblGameSelect.Name = "lblGameSelect";
             this.lblGameSelect.Size = new System.Drawing.Size(77, 13);
-            this.lblGameSelect.TabIndex = 1;
+            // Labels sollen nicht im Tab-Fokus erscheinen
+            this.lblGameSelect.TabIndex = 100;
             this.lblGameSelect.Text = "Choose Game:";
             this.toolTip1.SetToolTip(this.lblGameSelect, "Select a game.");
             // 
@@ -107,7 +108,7 @@
             this.cmbGameList.Location = new System.Drawing.Point(108, 23);
             this.cmbGameList.Name = "cmbGameList";
             this.cmbGameList.Size = new System.Drawing.Size(359, 21);
-            this.cmbGameList.TabIndex = 2;
+            this.cmbGameList.TabIndex = 0; // 1. Eintrag: Game-ComboBox
             this.toolTip1.SetToolTip(this.cmbGameList, "Choose a game from the list.");
             // 
             // lblProcessStatusLabel
@@ -116,9 +117,9 @@
             this.lblProcessStatusLabel.Location = new System.Drawing.Point(6, 52);
             this.lblProcessStatusLabel.Name = "lblProcessStatusLabel";
             this.lblProcessStatusLabel.Size = new System.Drawing.Size(81, 13);
-            this.lblProcessStatusLabel.TabIndex = 17;
+            this.lblProcessStatusLabel.TabIndex = 101;
             this.lblProcessStatusLabel.Text = "Process Status:";
-            this.toolTip1.SetToolTip(this.lblProcessStatusLabel, "Process status.");
+            this.toolTip1.SetToolTip(this.lblProcessStatusLabel, "Shows the process status.");
             // 
             // lblProcessStatus
             // 
@@ -126,7 +127,7 @@
             this.lblProcessStatus.Location = new System.Drawing.Point(105, 52);
             this.lblProcessStatus.Name = "lblProcessStatus";
             this.lblProcessStatus.Size = new System.Drawing.Size(117, 13);
-            this.lblProcessStatus.TabIndex = 18;
+            this.lblProcessStatus.TabIndex = 102;
             this.lblProcessStatus.Text = "Scanning for Process...";
             this.toolTip1.SetToolTip(this.lblProcessStatus, "Current process status.");
             // 
@@ -135,16 +136,16 @@
             this.txtWidth.Location = new System.Drawing.Point(103, 76);
             this.txtWidth.Name = "txtWidth";
             this.txtWidth.Size = new System.Drawing.Size(54, 20);
-            this.txtWidth.TabIndex = 4;
-            this.toolTip1.SetToolTip(this.txtWidth, "Width in pixels.");
+            this.txtWidth.TabIndex = 8; // After custom option
+            this.toolTip1.SetToolTip(this.txtWidth, "Enter the desired width in pixels.");
             // 
             // txtHeight
             // 
             this.txtHeight.Location = new System.Drawing.Point(187, 77);
             this.txtHeight.Name = "txtHeight";
             this.txtHeight.Size = new System.Drawing.Size(54, 20);
-            this.txtHeight.TabIndex = 5;
-            this.toolTip1.SetToolTip(this.txtHeight, "Height in pixels.");
+            this.txtHeight.TabIndex = 9; // Directly after width
+            this.toolTip1.SetToolTip(this.txtHeight, "Enter the desired height in pixels.");
             // 
             // lblWidth
             // 
@@ -152,7 +153,7 @@
             this.lblWidth.Location = new System.Drawing.Point(78, 80);
             this.lblWidth.Name = "lblWidth";
             this.lblWidth.Size = new System.Drawing.Size(21, 13);
-            this.lblWidth.TabIndex = 6;
+            this.lblWidth.TabIndex = 103;
             this.lblWidth.Text = "W:";
             this.toolTip1.SetToolTip(this.lblWidth, "Width (px).");
             // 
@@ -162,7 +163,7 @@
             this.lblHeight.Location = new System.Drawing.Point(163, 80);
             this.lblHeight.Name = "lblHeight";
             this.lblHeight.Size = new System.Drawing.Size(18, 13);
-            this.lblHeight.TabIndex = 7;
+            this.lblHeight.TabIndex = 104;
             this.lblHeight.Text = "H:";
             this.toolTip1.SetToolTip(this.lblHeight, "Height (px).");
             // 
@@ -172,10 +173,10 @@
             this.rbResCustom.Location = new System.Drawing.Point(6, 78);
             this.rbResCustom.Name = "rbResCustom";
             this.rbResCustom.Size = new System.Drawing.Size(60, 17);
-            this.rbResCustom.TabIndex = 30;
+            this.rbResCustom.TabIndex = 7; // Custom option
             this.rbResCustom.TabStop = true;
             this.rbResCustom.Text = "Custom";
-            this.toolTip1.SetToolTip(this.rbResCustom, "Use custom resolution.");
+            this.toolTip1.SetToolTip(this.rbResCustom, "Select custom resolution input.");
             this.rbResCustom.UseVisualStyleBackColor = true;
             // 
             // rbRes169
@@ -184,10 +185,10 @@
             this.rbRes169.Location = new System.Drawing.Point(5, 51);
             this.rbRes169.Name = "rbRes169";
             this.rbRes169.Size = new System.Drawing.Size(46, 17);
-            this.rbRes169.TabIndex = 31;
+            this.rbRes169.TabIndex = 5;
             this.rbRes169.TabStop = true;
             this.rbRes169.Text = "16:9";
-            this.toolTip1.SetToolTip(this.rbRes169, "Use 16:9 resolutions.");
+            this.toolTip1.SetToolTip(this.rbRes169, "Select 16:9 resolution mode.");
             this.rbRes169.UseVisualStyleBackColor = true;
             // 
             // rbRes43
@@ -196,10 +197,10 @@
             this.rbRes43.Location = new System.Drawing.Point(4, 28);
             this.rbRes43.Name = "rbRes43";
             this.rbRes43.Size = new System.Drawing.Size(40, 17);
-            this.rbRes43.TabIndex = 32;
+            this.rbRes43.TabIndex = 3;
             this.rbRes43.TabStop = true;
             this.rbRes43.Text = "4:3";
-            this.toolTip1.SetToolTip(this.rbRes43, "Use 4:3 resolutions.");
+            this.toolTip1.SetToolTip(this.rbRes43, "Select 4:3 resolution mode.");
             this.rbRes43.UseVisualStyleBackColor = true;
             // 
             // cmb169
@@ -208,8 +209,8 @@
             this.cmb169.Location = new System.Drawing.Point(103, 51);
             this.cmb169.Name = "cmb169";
             this.cmb169.Size = new System.Drawing.Size(121, 21);
-            this.cmb169.TabIndex = 26;
-            this.toolTip1.SetToolTip(this.cmb169, "Select a 16:9 resolution.");
+            this.cmb169.TabIndex = 6;
+            this.toolTip1.SetToolTip(this.cmb169, "Choose a 16:9 resolution from the list.");
             // 
             // cmb43
             // 
@@ -217,8 +218,8 @@
             this.cmb43.Location = new System.Drawing.Point(103, 24);
             this.cmb43.Name = "cmb43";
             this.cmb43.Size = new System.Drawing.Size(121, 21);
-            this.cmb43.TabIndex = 27;
-            this.toolTip1.SetToolTip(this.cmb43, "Select a 4:3 resolution.");
+            this.cmb43.TabIndex = 4;
+            this.toolTip1.SetToolTip(this.cmb43, "Choose a 4:3 resolution from the list.");
             // 
             // rbForceWindowed
             // 
@@ -226,10 +227,10 @@
             this.rbForceWindowed.Location = new System.Drawing.Point(6, 25);
             this.rbForceWindowed.Name = "rbForceWindowed";
             this.rbForceWindowed.Size = new System.Drawing.Size(94, 17);
-            this.rbForceWindowed.TabIndex = 0;
+            this.rbForceWindowed.TabIndex = 10;
             this.rbForceWindowed.TabStop = true;
             this.rbForceWindowed.Text = "Window Mode";
-            this.toolTip1.SetToolTip(this.rbForceWindowed, "Force windowed mode.");
+            this.toolTip1.SetToolTip(this.rbForceWindowed, "Force the application to run in window mode.");
             this.rbForceWindowed.UseVisualStyleBackColor = true;
             // 
             // rbFullscreen
@@ -238,7 +239,7 @@
             this.rbFullscreen.Location = new System.Drawing.Point(126, 25);
             this.rbFullscreen.Name = "rbFullscreen";
             this.rbFullscreen.Size = new System.Drawing.Size(103, 17);
-            this.rbFullscreen.TabIndex = 1;
+            this.rbFullscreen.TabIndex = 11;
             this.rbFullscreen.TabStop = true;
             this.rbFullscreen.Text = "Fullscreen Mode";
             this.toolTip1.SetToolTip(this.rbFullscreen, "Enable fullscreen mode.");
@@ -250,9 +251,9 @@
             this.chkRemoveFrame.Location = new System.Drawing.Point(6, 49);
             this.chkRemoveFrame.Name = "chkRemoveFrame";
             this.chkRemoveFrame.Size = new System.Drawing.Size(140, 17);
-            this.chkRemoveFrame.TabIndex = 16;
+            this.chkRemoveFrame.TabIndex = 12;
             this.chkRemoveFrame.Text = "Remove Window Frame";
-            this.toolTip1.SetToolTip(this.chkRemoveFrame, "Remove window border.");
+            this.toolTip1.SetToolTip(this.chkRemoveFrame, "Remove the window border for a frameless look.");
             this.chkRemoveFrame.UseVisualStyleBackColor = true;
             // 
             // lblDocking
@@ -261,9 +262,9 @@
             this.lblDocking.Location = new System.Drawing.Point(3, 48);
             this.lblDocking.Name = "lblDocking";
             this.lblDocking.Size = new System.Drawing.Size(90, 13);
-            this.lblDocking.TabIndex = 25;
+            this.lblDocking.TabIndex = 105;
             this.lblDocking.Text = "Docking Position:";
-            this.toolTip1.SetToolTip(this.lblDocking, "Select docking position.");
+            this.toolTip1.SetToolTip(this.lblDocking, "Select the desired docking position for the window.");
             // 
             // cmbDockPosition
             // 
@@ -271,8 +272,8 @@
             this.cmbDockPosition.Location = new System.Drawing.Point(105, 45);
             this.cmbDockPosition.Name = "cmbDockPosition";
             this.cmbDockPosition.Size = new System.Drawing.Size(114, 21);
-            this.cmbDockPosition.TabIndex = 23;
-            this.toolTip1.SetToolTip(this.cmbDockPosition, "Choose window docking position.");
+            this.cmbDockPosition.TabIndex = 2;
+            this.toolTip1.SetToolTip(this.cmbDockPosition, "Choose the docking position.");
             // 
             // lblMonitor
             // 
@@ -280,9 +281,9 @@
             this.lblMonitor.Location = new System.Drawing.Point(3, 24);
             this.lblMonitor.Name = "lblMonitor";
             this.lblMonitor.Size = new System.Drawing.Size(45, 13);
-            this.lblMonitor.TabIndex = 22;
+            this.lblMonitor.TabIndex = 106;
             this.lblMonitor.Text = "Monitor:";
-            this.toolTip1.SetToolTip(this.lblMonitor, "Select monitor.");
+            this.toolTip1.SetToolTip(this.lblMonitor, "Select the target monitor.");
             // 
             // cmbMonitor
             // 
@@ -290,17 +291,17 @@
             this.cmbMonitor.Location = new System.Drawing.Point(105, 21);
             this.cmbMonitor.Name = "cmbMonitor";
             this.cmbMonitor.Size = new System.Drawing.Size(244, 21);
-            this.cmbMonitor.TabIndex = 21;
-            this.toolTip1.SetToolTip(this.cmbMonitor, "Choose target monitor.");
+            this.cmbMonitor.TabIndex = 1;
+            this.toolTip1.SetToolTip(this.cmbMonitor, "Choose the monitor on which to display the window.");
             // 
             // btnResize
             // 
             this.btnResize.Location = new System.Drawing.Point(176, 389);
             this.btnResize.Name = "btnResize";
             this.btnResize.Size = new System.Drawing.Size(135, 35);
-            this.btnResize.TabIndex = 11;
+            this.btnResize.TabIndex = 13;
             this.btnResize.Text = "Resize";
-            this.toolTip1.SetToolTip(this.btnResize, "Apply changes.");
+            this.toolTip1.SetToolTip(this.btnResize, "Apply the selected changes.");
             this.btnResize.UseVisualStyleBackColor = true;
             this.btnResize.Click += new System.EventHandler(this.btnResize_Click);
             // 
@@ -309,7 +310,7 @@
             this.pbProcess.Location = new System.Drawing.Point(215, 46);
             this.pbProcess.Name = "pbProcess";
             this.pbProcess.Size = new System.Drawing.Size(35, 25);
-            this.pbProcess.TabIndex = 26;
+            this.pbProcess.TabIndex = 107;
             this.pbProcess.TabStop = false;
             this.toolTip1.SetToolTip(this.pbProcess, "Process status icon.");
             // 
@@ -320,8 +321,9 @@
             this.lblGameSelectionHeader.Location = new System.Drawing.Point(3, 0);
             this.lblGameSelectionHeader.Name = "lblGameSelectionHeader";
             this.lblGameSelectionHeader.Size = new System.Drawing.Size(95, 13);
-            this.lblGameSelectionHeader.TabIndex = 0;
+            this.lblGameSelectionHeader.TabIndex = 108;
             this.lblGameSelectionHeader.Text = "Process Details";
+            this.toolTip1.SetToolTip(this.lblGameSelectionHeader, "Game selection and process details.");
             // 
             // lblMonitorOptionsHeader
             // 
@@ -330,8 +332,9 @@
             this.lblMonitorOptionsHeader.Location = new System.Drawing.Point(3, 0);
             this.lblMonitorOptionsHeader.Name = "lblMonitorOptionsHeader";
             this.lblMonitorOptionsHeader.Size = new System.Drawing.Size(92, 13);
-            this.lblMonitorOptionsHeader.TabIndex = 0;
+            this.lblMonitorOptionsHeader.TabIndex = 109;
             this.lblMonitorOptionsHeader.Text = "Monitor Details";
+            this.toolTip1.SetToolTip(this.lblMonitorOptionsHeader, "Monitor and docking options.");
             // 
             // lblResolutionOptionsHeader
             // 
@@ -340,8 +343,9 @@
             this.lblResolutionOptionsHeader.Location = new System.Drawing.Point(3, 2);
             this.lblResolutionOptionsHeader.Name = "lblResolutionOptionsHeader";
             this.lblResolutionOptionsHeader.Size = new System.Drawing.Size(110, 13);
-            this.lblResolutionOptionsHeader.TabIndex = 0;
+            this.lblResolutionOptionsHeader.TabIndex = 110;
             this.lblResolutionOptionsHeader.Text = "Resolution Details";
+            this.toolTip1.SetToolTip(this.lblResolutionOptionsHeader, "Select the desired resolution settings.");
             // 
             // lblWindowOptionsHeader
             // 
@@ -350,8 +354,9 @@
             this.lblWindowOptionsHeader.Location = new System.Drawing.Point(3, 0);
             this.lblWindowOptionsHeader.Name = "lblWindowOptionsHeader";
             this.lblWindowOptionsHeader.Size = new System.Drawing.Size(95, 13);
-            this.lblWindowOptionsHeader.TabIndex = 0;
+            this.lblWindowOptionsHeader.TabIndex = 111;
             this.lblWindowOptionsHeader.Text = "Window Details";
+            this.toolTip1.SetToolTip(this.lblWindowOptionsHeader, "Configure window mode and border options.");
             // 
             // pnlGameSelection
             // 
@@ -366,17 +371,19 @@
             this.pnlGameSelection.Location = new System.Drawing.Point(9, 10);
             this.pnlGameSelection.Name = "pnlGameSelection";
             this.pnlGameSelection.Size = new System.Drawing.Size(495, 96);
-            this.pnlGameSelection.TabIndex = 19;
+            this.pnlGameSelection.TabIndex = 112;
+            this.toolTip1.SetToolTip(this.pnlGameSelection, "Panel for game selection and process status.");
             // 
             // LL_AoDInfo
             // 
             this.LL_AoDInfo.AutoSize = true;
             this.LL_AoDInfo.Location = new System.Drawing.Point(6, 73);
             this.LL_AoDInfo.Name = "LL_AoDInfo";
-            this.LL_AoDInfo.Size = new System.Drawing.Size(223, 13);
-            this.LL_AoDInfo.TabIndex = 33;
-            this.LL_AoDInfo.TabStop = true;
+            this.LL_AoDInfo.Size = new System.Drawing.Size(384, 13);
+            this.LL_AoDInfo.TabIndex = 200;
+            this.LL_AoDInfo.TabStop = false;
             this.LL_AoDInfo.Text = "Note: For the proper experience, please be sure set your display scaling to 100%";
+            this.toolTip1.SetToolTip(this.LL_AoDInfo, "Important note regarding game settings.");
             // 
             // pnlMonitorOptions
             // 
@@ -389,7 +396,8 @@
             this.pnlMonitorOptions.Location = new System.Drawing.Point(9, 112);
             this.pnlMonitorOptions.Name = "pnlMonitorOptions";
             this.pnlMonitorOptions.Size = new System.Drawing.Size(495, 76);
-            this.pnlMonitorOptions.TabIndex = 20;
+            this.pnlMonitorOptions.TabIndex = 113;
+            this.toolTip1.SetToolTip(this.pnlMonitorOptions, "Panel for monitor selection and docking position.");
             // 
             // pnlResolutionOptions
             // 
@@ -407,7 +415,8 @@
             this.pnlResolutionOptions.Location = new System.Drawing.Point(9, 194);
             this.pnlResolutionOptions.Name = "pnlResolutionOptions";
             this.pnlResolutionOptions.Size = new System.Drawing.Size(495, 110);
-            this.pnlResolutionOptions.TabIndex = 23;
+            this.pnlResolutionOptions.TabIndex = 114;
+            this.toolTip1.SetToolTip(this.pnlResolutionOptions, "Panel for selecting resolution options.");
             // 
             // pnlWindowOptions
             // 
@@ -419,7 +428,8 @@
             this.pnlWindowOptions.Location = new System.Drawing.Point(9, 310);
             this.pnlWindowOptions.Name = "pnlWindowOptions";
             this.pnlWindowOptions.Size = new System.Drawing.Size(495, 73);
-            this.pnlWindowOptions.TabIndex = 22;
+            this.pnlWindowOptions.TabIndex = 115;
+            this.toolTip1.SetToolTip(this.pnlWindowOptions, "Panel for window mode and border options.");
             // 
             // MainForm
             // 
@@ -442,7 +452,6 @@
             this.pnlWindowOptions.ResumeLayout(false);
             this.pnlWindowOptions.PerformLayout();
             this.ResumeLayout(false);
-
         }
 
         #endregion
