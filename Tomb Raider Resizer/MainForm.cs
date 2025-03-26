@@ -57,9 +57,26 @@ namespace Tomb_Raider_Resizer
             btnResize.Enabled = false;
             UpdateControlStates();
 
-            // Start process checking for the initially selected game.
+            // Prüfe den initial ausgewählten Game-Eintrag und setze LL_AoDInfo.
             if (cmbGameList.SelectedItem is GameInfo initialGame)
             {
+                if (initialGame.Title.Contains("Angel of Darkness"))
+                {
+                    LL_AoDInfo.Text = "Note: Make sure to set the game to windowed in TRAODSCU. Only resizing available.";
+                }
+                else
+                {
+                    LL_AoDInfo.Text = "Note: For the proper experience, please be sure set your display scaling to 100%";
+                }
+                LL_AoDInfo.Links.Clear();
+                // Unterstreicht nur "Note: " (6 Zeichen)
+                LL_AoDInfo.Links.Add(0, 6, null);
+                LL_AoDInfo.LinkColor = LL_AoDInfo.ForeColor;
+                LL_AoDInfo.ActiveLinkColor = LL_AoDInfo.ForeColor;
+                LL_AoDInfo.VisitedLinkColor = LL_AoDInfo.ForeColor;
+
+                lblProcessStatus.Text = "Searching...";
+                SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
                 StartProcessCheck(initialGame);
             }
         }
@@ -119,7 +136,6 @@ namespace Tomb_Raider_Resizer
 
             lblMonitor.Enabled = isProcessFound;
             lblDocking.Enabled = isProcessFound;
-            lblNote.Enabled = isProcessFound;
             lblWidth.Enabled = isProcessFound;
             lblHeight.Enabled = isProcessFound;
 
@@ -265,12 +281,46 @@ namespace Tomb_Raider_Resizer
             {
                 this.BackColor = Color.FromArgb(45, 45, 48);
                 this.ForeColor = Color.White;
-                // Für Dark Mode: ein dunkles Grau, das besser zu den anderen Elementen passt
+                // Im Dark Mode: Verwende einen dunkleren Grauton für den Resize-Button.
                 btnResize.BackColor = Color.FromArgb(63, 63, 70);
                 btnResize.ForeColor = Color.White;
+            }
+            // Aktualisiere alle Steuerelemente (außer ComboBoxes) auf die aktuelle ForeColor.
+            UpdateControlColors(this.Controls);
 
+            // Passe auch die Linkfarben des LL_AoDInfo an den aktuellen Modus an.
+            if (LL_AoDInfo != null)
+            {
+                LL_AoDInfo.LinkColor = LL_AoDInfo.ForeColor;
+                LL_AoDInfo.ActiveLinkColor = LL_AoDInfo.ForeColor;
+                LL_AoDInfo.VisitedLinkColor = LL_AoDInfo.ForeColor;
             }
         }
+
+        private void UpdateControlColors(Control.ControlCollection controls)
+        {
+            foreach (Control ctrl in controls)
+            {
+                // Wenn es sich um eine ComboBox handelt, nicht ändern.
+                if (!(ctrl is ComboBox))
+                {
+                    // Nur Labels, RadioButtons, CheckBoxes, LinkLabels und Buttons anpassen – TextBoxen außen vor!
+                    if (ctrl is Label ||
+                        ctrl is RadioButton ||
+                        ctrl is CheckBox ||
+                        ctrl is LinkLabel ||
+                        ctrl is Button)
+                    {
+                        ctrl.ForeColor = this.ForeColor;
+                    }
+                }
+                if (ctrl.HasChildren)
+                {
+                    UpdateControlColors(ctrl.Controls);
+                }
+            }
+        }
+
 
         protected override void WndProc(ref Message m)
         {
@@ -402,11 +452,21 @@ namespace Tomb_Raider_Resizer
                 SetProcessStatusIcon(Tomb_Raider_Resizer.Properties.Resources.loadingAnimated);
                 StartProcessCheck(selectedGame);
 
-                // Bei "Angel of Darkness" sofort Window Mode erzwingen.
                 if (selectedGame.Title.Contains("Angel of Darkness"))
                 {
                     rbForceWindowed.Checked = true;
+                    LL_AoDInfo.Text = "Note: You need to set the window mode in TRAODSCU. Only window resizing is available.";
                 }
+                else
+                {
+                    LL_AoDInfo.Text = "Note: For the proper experience, please be sure set your display scaling to 100%.";
+                }
+                LL_AoDInfo.Links.Clear();
+                // Unterstreicht nur "Note: " (6 Zeichen)
+                LL_AoDInfo.Links.Add(0, 6, null);
+                LL_AoDInfo.LinkColor = LL_AoDInfo.ForeColor;
+                LL_AoDInfo.ActiveLinkColor = LL_AoDInfo.ForeColor;
+                LL_AoDInfo.VisitedLinkColor = LL_AoDInfo.ForeColor;
                 UpdateControlStates();
             }
         }
@@ -472,7 +532,6 @@ namespace Tomb_Raider_Resizer
         private void cmb169_SelectedIndexChanged(object sender, EventArgs e) { }
         private void cmb43_SelectedIndexChanged(object sender, EventArgs e) { }
 
-        // ...
         private void btnResize_Click(object sender, EventArgs e)
         {
             if (!(cmbGameList.SelectedItem is GameInfo selectedGame))

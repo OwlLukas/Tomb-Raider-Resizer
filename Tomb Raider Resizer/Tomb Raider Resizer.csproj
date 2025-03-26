@@ -86,6 +86,7 @@
   <ItemGroup>
     <Content Include="images\greenCheckmark.png" />
     <Content Include="images\loadingAnimated.gif" />
+    <Content Include="images\projectIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
