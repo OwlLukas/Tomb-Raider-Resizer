@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🪟 Tomb Raider Resizer
 ![AppIcon](https://github.com/OwlLukas/Tomb-Raider-Resizer/blob/main/Tomb%20Raider%20Resizer/windowIcon.ico)
 <br>A lightweight Windows Forms tool that allows you to resize and reposition Tomb Raider games windows with ease.
@@ -48,3 +49,7 @@
 ## 📝 License
 
 This project is licensed under the MIT License.
+=======
+# Tomb-Raider-Resizer
+A lightweight windows forms application that supports window mode, resizing, docking and more for the Tomb Raider Remasters and The Angel of Darkness.
+>>>>>>> 47c9d74ee54c36a2117e76d9e8917f519c31ee45
