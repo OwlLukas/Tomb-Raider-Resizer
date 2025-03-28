@@ -1,5 +1,5 @@
 # 🪟 Tomb Raider Resizer
-![AppIcon](https://raw.githubusercontent.com/OwlLukas/Tomb-Raider-Resizer/main/Tomb%20Raider%20Resizer/images/projectIcon.png)
+![AppIcon]([https://raw.githubusercontent.com/OwlLukas/Tomb-Raider-Resizer/main/Tomb%20Raider%20Resizer/images/projectIcon.png](https://github.com/OwlLukas/Tomb-Raider-Resizer/blob/main/Tomb%20Raider%20Resizer/images/projectIcon.png))
 
 <br>A lightweight Windows Forms tool that allows you to resize and reposition Tomb Raider games windows with ease.
 
