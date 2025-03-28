@@ -89,9 +89,9 @@ namespace Tomb_Raider_Resizer
         }
 
         /// <summary>
-        /// Ändert die Fenstergröße und -position des angegebenen Prozesses.
-        /// Wird "Remove Window Frame" aktiviert, wird der Fensterstil explizit auf WS_POPUP gesetzt und das Fenster mehrfach neu gezeichnet.
-        /// Diese Logik wird nun einheitlich für alle Auflösungsmodi (Custom, 16:9, 4:3) angewandt.
+        /// Changes the window size and position of the specified process.
+        /// If "Remove Window Frame" is activated, the window style is explicitly set to WS_POPUP and the window is redrawn multiple times.
+        /// This logic is applied uniformly for all resolution modes (Custom, 16:9, 4:3).
         /// </summary>
         public static void ResizeWindow(string processName, int width, int height, bool removeFrame, bool forceWindowed, Rectangle area, DockPosition dockPos, bool skipFlicker = false)
         {
@@ -102,12 +102,11 @@ namespace Tomb_Raider_Resizer
             if (hwnd == IntPtr.Zero)
                 return;
 
-            // Setze den Fensterstil je nach Modus und ob der Rahmen entfernt werden soll.
+            // Set the window style depending on the mode and whether the frame should be removed.
             if (forceWindowed)
             {
                 if (removeFrame)
                 {
-                    // Entferne Rahmen: WS_CAPTION, WS_THICKFRAME und WS_BORDER
                     int style = GetWindowLong(hwnd, GWL_STYLE) & ~(WS_CAPTION | WS_THICKFRAME | WS_BORDER);
                     SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(style));
                     int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW;
@@ -143,7 +142,7 @@ namespace Tomb_Raider_Resizer
                 }
             }
 
-            // Berechne die neue Position basierend auf der gewählten Docking-Position.
+            // Calculate the new position based on the selected docking position.
             int newX, newY;
             switch (dockPos)
             {
@@ -170,7 +169,6 @@ namespace Tomb_Raider_Resizer
                     break;
             }
 
-            // Setze Fenstergröße und -position.
             MoveWindow(hwnd, newX, newY, width, height, true);
             SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0,
                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
@@ -184,8 +182,6 @@ namespace Tomb_Raider_Resizer
                 MoveWindow(hwnd, newX, newY, width, height, true);
             }
 
-            // Wenn "Remove Window Frame" aktiviert ist, setze nun den WS_POPUP-Stil und aktualisiere das Fenster
-            // – dies entspricht exakt der Logik, die bei 16:9 und 4:3 funktioniert.
             if (removeFrame)
             {
                 SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(unchecked((int)0x80000000))); // WS_POPUP
@@ -267,7 +263,7 @@ namespace Tomb_Raider_Resizer
             if (hwnd == IntPtr.Zero)
                 return;
 
-            // Für Fullscreen immer rahmenlos: WS_POPUP
+            // For fullscreen always borderless: WS_POPUP
             SetWindowLongPtrCompat(hwnd, GWL_STYLE, new IntPtr(unchecked((int)0x80000000))); // WS_POPUP
             int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE) & ~0x00000008;
             exStyle |= WS_EX_APPWINDOW;
@@ -295,48 +291,5 @@ namespace Tomb_Raider_Resizer
             RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero,
                 RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
         }
-
-        #region Display Settings API
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        public struct DEVMODE
-        {
-            private const int CCHDEVICENAME = 32;
-            private const int CCHFORMNAME = 32;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHDEVICENAME)]
-            public string dmDeviceName;
-            public short dmSpecVersion;
-            public short dmDriverVersion;
-            public short dmSize;
-            public short dmDriverExtra;
-            public int dmFields;
-            public int dmPositionX;
-            public int dmPositionY;
-            public int dmDisplayOrientation;
-            public int dmDisplayFixedOutput;
-            public short dmColor;
-            public short dmDuplex;
-            public short dmYResolution;
-            public short dmTTOption;
-            public short dmCollate;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCHFORMNAME)]
-            public string dmFormName;
-            public short dmLogPixels;
-            public int dmBitsPerPel;
-            public int dmPelsWidth;
-            public int dmPelsHeight;
-            public int dmDisplayFlags;
-            public int dmDisplayFrequency;
-            public int dmICMMethod;
-            public int dmICMIntent;
-            public int dmMediaType;
-            public int dmDitherType;
-            public int dmReserved1;
-            public int dmReserved2;
-            public int dmPanningWidth;
-            public int dmPanningHeight;
-        }
-
-        #endregion
     }
 }

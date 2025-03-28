@@ -48,7 +48,7 @@ namespace Tomb_Raider_Resizer
             rbFullscreen.CheckedChanged += DisplayModeChanged;
             rbForceWindowed.CheckedChanged += DisplayModeChanged;
 
-            // Automatische Anpassung der Docking Position beim Ändern der Monitor Position:
+            // Adjust docking position automatically when the monitor changes.
             cmbDockPosition.SelectedIndexChanged += cmbDockPosition_SelectedIndexChanged;
 
             // Update resolution controls based on the selected resolution mode.
@@ -57,7 +57,7 @@ namespace Tomb_Raider_Resizer
             btnResize.Enabled = false;
             UpdateControlStates();
 
-            // Prüfe den initial ausgewählten Game-Eintrag und setze LL_AoDInfo.
+            // Check the initially selected game and set LL_AoDInfo accordingly.
             if (cmbGameList.SelectedItem is GameInfo initialGame)
             {
                 if (initialGame.Title.Contains("Angel of Darkness"))
@@ -69,7 +69,7 @@ namespace Tomb_Raider_Resizer
                     LL_AoDInfo.Text = "Note: For the proper experience, please be sure set your display scaling to 100%";
                 }
                 LL_AoDInfo.Links.Clear();
-                // Unterstreicht nur "Note: " (6 Zeichen)
+                // Underline only "Note: " (6 characters)
                 LL_AoDInfo.Links.Add(0, 6, null);
                 LL_AoDInfo.LinkColor = LL_AoDInfo.ForeColor;
                 LL_AoDInfo.ActiveLinkColor = LL_AoDInfo.ForeColor;
@@ -85,7 +85,7 @@ namespace Tomb_Raider_Resizer
 
         private void UpdateControlStates()
         {
-            // Wenn Fullscreen Mode aktiviert ist, alle Resolution-Controls deaktivieren.
+            // If Fullscreen Mode is activated, disable all resolution controls.
             if (rbFullscreen.Checked)
             {
                 txtWidth.Text = "";
@@ -139,15 +139,15 @@ namespace Tomb_Raider_Resizer
             lblWidth.Enabled = isProcessFound;
             lblHeight.Enabled = isProcessFound;
 
-            // Spezifische Anpassungen für "Tomb Raider The Angel of Darkness"
+            // Specific adjustments for "Tomb Raider The Angel of Darkness"
             if (cmbGameList.SelectedItem is GameInfo selectedGame &&
                 selectedGame.Title.Contains("Angel of Darkness"))
             {
-                // Deaktiviere Fullscreen Radiobox und Monitor Combobox
+                // Disable Fullscreen radiobutton and monitor combobox.
                 rbFullscreen.Enabled = false;
                 cmbMonitor.Enabled = false;
 
-                // Falls versehentlich Fullscreen ausgewählt wurde, schalte auf Window Mode um.
+                // If Fullscreen was accidentally selected, switch back to Window Mode.
                 if (rbFullscreen.Checked)
                 {
                     rbForceWindowed.Checked = true;
@@ -157,23 +157,7 @@ namespace Tomb_Raider_Resizer
 
         private void DisplayModeChanged(object sender, EventArgs e)
         {
-            if (rbFullscreen.Checked)
-            {
-                txtWidth.Text = "";
-                txtHeight.Text = "";
-                txtWidth.Enabled = false;
-                txtHeight.Enabled = false;
-                cmbDockPosition.SelectedIndex = 4;
-                cmbDockPosition.Enabled = false;
-                chkRemoveFrame.Enabled = false;
-            }
-            else
-            {
-                txtWidth.Enabled = isProcessFound;
-                txtHeight.Enabled = isProcessFound;
-                cmbDockPosition.Enabled = isProcessFound;
-                chkRemoveFrame.Enabled = isProcessFound;
-            }
+            // Simply update control states when the display mode changes.
             UpdateControlStates();
         }
 
@@ -281,14 +265,14 @@ namespace Tomb_Raider_Resizer
             {
                 this.BackColor = Color.FromArgb(45, 45, 48);
                 this.ForeColor = Color.White;
-                // Im Dark Mode: Verwende einen dunkleren Grauton für den Resize-Button.
+                // In Dark Mode, use a darker gray for the Resize button.
                 btnResize.BackColor = Color.FromArgb(63, 63, 70);
                 btnResize.ForeColor = Color.White;
             }
-            // Aktualisiere alle Steuerelemente (außer ComboBoxes) auf die aktuelle ForeColor.
+            // Update colors for controls (except ComboBoxes)
             UpdateControlColors(this.Controls);
 
-            // Passe auch die Linkfarben des LL_AoDInfo an den aktuellen Modus an.
+            // Update LL_AoDInfo link colors to match current mode.
             if (LL_AoDInfo != null)
             {
                 LL_AoDInfo.LinkColor = LL_AoDInfo.ForeColor;
@@ -301,10 +285,8 @@ namespace Tomb_Raider_Resizer
         {
             foreach (Control ctrl in controls)
             {
-                // Wenn es sich um eine ComboBox handelt, nicht ändern.
                 if (!(ctrl is ComboBox))
                 {
-                    // Nur Labels, RadioButtons, CheckBoxes, LinkLabels und Buttons anpassen – TextBoxen außen vor!
                     if (ctrl is Label ||
                         ctrl is RadioButton ||
                         ctrl is CheckBox ||
@@ -320,7 +302,6 @@ namespace Tomb_Raider_Resizer
                 }
             }
         }
-
 
         protected override void WndProc(ref Message m)
         {
@@ -462,7 +443,7 @@ namespace Tomb_Raider_Resizer
                     LL_AoDInfo.Text = "Note: For the proper experience, please be sure set your display scaling to 100%.";
                 }
                 LL_AoDInfo.Links.Clear();
-                // Unterstreicht nur "Note: " (6 Zeichen)
+                // Underline only "Note: " (6 characters)
                 LL_AoDInfo.Links.Add(0, 6, null);
                 LL_AoDInfo.LinkColor = LL_AoDInfo.ForeColor;
                 LL_AoDInfo.ActiveLinkColor = LL_AoDInfo.ForeColor;
@@ -489,7 +470,7 @@ namespace Tomb_Raider_Resizer
             }
             else
             {
-                // Beim Monitorwechsel soll auch die aktuelle Docking Position berücksichtigt werden:
+                // When the monitor changes, also consider the current docking position.
                 MoveGameWindowToSelectedMonitor();
             }
         }
@@ -507,7 +488,7 @@ namespace Tomb_Raider_Resizer
                 if (!string.IsNullOrEmpty(processName))
                 {
                     var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
-                    // Fenster neu positionieren gemäß Docking Position:
+                    // Reposition window according to docking position.
                     ResizeHelper.DockWindowToMonitor(processName, workingArea, dockPos);
                 }
             }
@@ -515,7 +496,7 @@ namespace Tomb_Raider_Resizer
 
         private void cmbDockPosition_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // Automatische Anpassung der Docking Position:
+            // Automatically adjust the docking position.
             if (!isProcessFound) return;
             if (rbFullscreen.Checked) return;
             if (!(cmbGameList.SelectedItem is GameInfo selectedGame)) return;
@@ -524,13 +505,9 @@ namespace Tomb_Raider_Resizer
                 return;
             Rectangle workingArea = Screen.AllScreens[monitorIndex].WorkingArea;
             var dockPos = (ResizeHelper.DockPosition)cmbDockPosition.SelectedIndex;
-            // Fenster an die neue Docking Position verschieben
+            // Move window to new docking position.
             ResizeHelper.DockWindowToMonitor(GetActiveProcessName(selectedGame), workingArea, dockPos);
         }
-
-        // For predefined resolution ComboBoxes the Resize button is disabled (auto-resize)
-        private void cmb169_SelectedIndexChanged(object sender, EventArgs e) { }
-        private void cmb43_SelectedIndexChanged(object sender, EventArgs e) { }
 
         private void btnResize_Click(object sender, EventArgs e)
         {
@@ -545,7 +522,7 @@ namespace Tomb_Raider_Resizer
             bool removeFrame = chkRemoveFrame.Checked;
             int width = 0, height = 0;
 
-            // Zuerst: Wenn Fullscreen ausgewählt ist, führe den Fullscreen-Zweig aus.
+            // If Fullscreen is selected, execute the fullscreen branch.
             if (rbFullscreen.Checked)
             {
                 Rectangle bounds = Screen.AllScreens[monitorIndex].Bounds;
@@ -619,8 +596,8 @@ namespace Tomb_Raider_Resizer
         #region Helper Methods
 
         /// <summary>
-        /// Durchläuft die in GameInfo.ProcessNames gespeicherten Prozessnamen und gibt den ersten zurück,
-        /// bei dem ein laufender Prozess gefunden wird. Andernfalls wird null zurückgegeben.
+        /// Iterates through the process names stored in GameInfo and returns the first that is running.
+        /// Otherwise, returns null.
         /// </summary>
         private string GetActiveProcessName(GameInfo game)
         {
