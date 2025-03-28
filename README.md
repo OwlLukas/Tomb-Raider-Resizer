@@ -1,13 +1,13 @@
-<<<<<<< HEAD
 # 🪟 Tomb Raider Resizer
-![AppIcon](https://github.com/OwlLukas/Tomb-Raider-Resizer/blob/main/Tomb%20Raider%20Resizer/windowIcon.ico)
+![AppIcon](https://raw.githubusercontent.com/OwlLukas/Tomb-Raider-Resizer/main/Tomb%20Raider%20Resizer/images/projectIcon.png)
+
 <br>A lightweight Windows Forms tool that allows you to resize and reposition Tomb Raider games windows with ease.
 
 ---
 
 ## 🔧 Features
 
-- Automatically detects running Tomb Raider processes
+- Automatically detects running Tomb Raider processes for I-III & IV-VI Remastered.
 - Select target monitor for the game window
 - Predefined docking positions (e.g., Top Right, Center)
 - Optional window modifications:
@@ -16,13 +16,13 @@
 - Supports:
   - **Tomb Raider I–III Remastered**
   - **Tomb Raider IV–VI Remastered**
-  - **Tomb Raider: The Angel of Darkness (2003)**
+  - **Tomb Raider: The Angel of Darkness (2003)** (Limited to resizing only, requires window mode in TRAODCU.)
 
 ---
 
 ## 🚀 How to Use
 
-1. Launch your desired Tomb Raider game.
+1. Launch a supported Tomb Raider game.
 2. Open **Tomb Raider Resizer**.
 3. Select the game and monitor.
 4. Enter desired window width and height.
@@ -42,7 +42,6 @@
 
 - Language: **C# / Windows Forms**
 - Uses **WinAPI (P/Invoke)** for direct window manipulation
-- Open Source: [GitHub Repository](https://github.com/yourUsername/yourRepo)
 
 ---
 
