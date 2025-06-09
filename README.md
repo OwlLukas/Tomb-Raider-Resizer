@@ -44,11 +44,3 @@
 - Uses **WinAPI (P/Invoke)** for direct window manipulation
 
 ---
-
-## 📝 License
-
-This project is licensed under the MIT License.
-=======
-# Tomb-Raider-Resizer
-A lightweight windows forms application that supports window mode, resizing, docking and more for the Tomb Raider Remasters and The Angel of Darkness.
->>>>>>> 47c9d74ee54c36a2117e76d9e8917f519c31ee45
